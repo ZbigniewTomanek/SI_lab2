@@ -1,4 +1,4 @@
-package model
+package model.jolka
 
 class Jolka(private val index: Int,
             private val puzzle: List<List<Char>>,
