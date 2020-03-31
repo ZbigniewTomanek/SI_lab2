@@ -6,7 +6,7 @@ class InsolvableProblemException(msg: String) : Exception(msg)
 
 object CSPSolver
 {
-    private fun <T> findValueForVariable(problem: CSPProblem<T>, variable: Variable<T>)
+    private fun <T, S> findValueForVariable(problem: CSPProblem<T, S>, variable: Variable<T>)
     {
         var currentVariable = variable
         var value = variable.getNextValue()
@@ -26,7 +26,7 @@ object CSPSolver
         }
         else
         {
-            currentVariable.setValue(value)
+            currentVariable.assignValue(value)
 
             if (problem.areConstraintsSatisfied())
             {
@@ -40,7 +40,7 @@ object CSPSolver
 
     }
 
-    fun <T> findCSPSolution(problem: CSPProblem<T>): Any
+    fun <T, S> findCSPSolution(problem: CSPProblem<T, S>): S
     {
         var currentVariable: Variable<T>
 
