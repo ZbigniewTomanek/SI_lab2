@@ -13,6 +13,11 @@ object Reader
     fun getSudoku(index: Int) = sudokus[index]
     fun getSudoku(difficulty: Float) = sudokus.first { s -> s.difficultyLevel == difficulty }
 
+    init
+    {
+        readSudokus()
+    }
+
 
     private fun stringToSudoku(sudokuString: String): List<List<Char>>
     {

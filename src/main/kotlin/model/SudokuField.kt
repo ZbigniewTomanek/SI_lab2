@@ -3,10 +3,10 @@ package model
 import csp.ValueHeuristic
 import csp.Variable
 
-class SudokuField(var value: Char, valueHeuristic: ValueHeuristic<Char>)
+class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
     : Variable<Char>(valueHeuristic)
 {
-    lateinit var domain: List<Char>
+    private lateinit var domain: List<Char>
 
 
     override fun assignValue(value: Char)
@@ -24,9 +24,12 @@ class SudokuField(var value: Char, valueHeuristic: ValueHeuristic<Char>)
         return valueHeuristic.hasNextValue(domain)
     }
 
-    override fun calculateDomain(variables: List<List<Variable<Char>>>)
+    override fun setDomain(domain: List<Char>)
     {
-        TODO("Not yet implemented")
+        this.domain = domain
     }
 
+    override fun getValue(): Char = value
+
+    override fun toString() = "Var(val: $value, domain: $domain)"
 }

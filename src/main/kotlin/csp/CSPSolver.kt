@@ -9,11 +9,9 @@ object CSPSolver
     private fun <T, S> findValueForVariable(problem: CSPProblem<T, S>, variable: Variable<T>)
     {
         var currentVariable = variable
-        var value = variable.getNextValue()
 
         if (!variable.hasNextValue())
         {
-            currentVariable = problem.getPreviousVariable()
 
             if (!problem.hasPreviousVariable())
             {
@@ -21,11 +19,13 @@ object CSPSolver
             }
             else
             {
+                currentVariable = problem.getPreviousVariable()
                 findValueForVariable(problem, currentVariable)
             }
         }
         else
         {
+            val value = variable.getNextValue()
             currentVariable.assignValue(value)
 
             if (problem.areConstraintsSatisfied())
@@ -46,12 +46,16 @@ object CSPSolver
 
         while (true)
         {
-            currentVariable = problem.getNextVariable()
+
 
             if (!problem.hasNextVariable())
             {
                 println("Znaleziono rozwiaznie")
                 break
+            }
+            else
+            {
+                currentVariable = problem.getNextVariable()
             }
 
             findValueForVariable(problem, currentVariable)
