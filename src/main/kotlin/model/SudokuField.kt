@@ -9,21 +9,24 @@ class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
     private lateinit var domain: MutableList<Char>
 
     private val domainHistory = mutableListOf<MutableList<Char>>()
-    private var valueHistory = mutableListOf(value)
+    private var valueHistory = mutableListOf<Char>()
 
 
     override fun backTrack()
     {
-        this.value = valueHistory.removeAt(valueHistory.size - 2)
-        this.domain = domainHistory.removeAt(domainHistory.size - 2)
+        this.value = valueHistory.removeAt(valueHistory.size - 1)
+        this.domain = domainHistory.removeAt(domainHistory.size - 1)
+    }
+
+    override fun memorizeState()
+    {
+        domainHistory.add(domain.toMutableList())
+        valueHistory.add(value)
     }
 
 
     override fun assignValue(value: Char)
     {
-        valueHistory.add(value)
-        domainHistory.add(domain)
-
         this.value = value
     }
 
@@ -42,8 +45,9 @@ class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
     override fun setDomain(domain: List<Char>)
     {
         this.domain = domain.toMutableList()
-        domainHistory.add(this.domain)
     }
+
+    override fun getDomain(): List<Char> = domain.toList()
 
     override fun getValue(): Char = value
 

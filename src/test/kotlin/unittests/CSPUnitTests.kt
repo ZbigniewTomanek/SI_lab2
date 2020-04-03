@@ -97,12 +97,9 @@ class CSPUnitTests
     {
         val variable = sudokuProblem.getNextVariable()
         val firstValue = variable.getValue()
-        println(firstValue)
 
         sudokuProblem.assignValueForVariable('1', variable)
         sudokuProblem.backTrack()
-
-        println(variable.getValue())
 
         assert(firstValue == variable.getValue())
     }
