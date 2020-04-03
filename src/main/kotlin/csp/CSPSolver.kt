@@ -11,12 +11,10 @@ object CSPSolver
 
     private fun <T, S> findValueForVariable(problem: CSPProblem<T, S>, variable: Variable<T>)
     {
-        println(variable)
         var currentVariable = variable
 
         if (!variable.hasNextValue())
         {
-            println("Recurrence")
             problem.backTrack()
             recurrencesOfLastRun++
             currentVariable = problem.getPreviousVariable()
@@ -40,7 +38,6 @@ object CSPSolver
 
             if (problem.areConstraintsSatisfied())
             {
-                println("found value for variable $variable")
                 return
             }
             else
@@ -58,13 +55,12 @@ object CSPSolver
         while (true)
         {
 
-            currentVariable = problem.getNextVariable()
             if (!problem.hasNextVariable())
             {
                 println("Znaleziono rozwiaznie")
                 break
             }
-
+            currentVariable = problem.getNextVariable()
             findValueForVariable(problem, currentVariable)
         }
 

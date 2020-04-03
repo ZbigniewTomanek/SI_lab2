@@ -1,9 +1,11 @@
 package unittests
 
+import csp.CSPSolver
 import csp.Variable
 import csp.heuristics.BaselineValueHeuristic
 import csp.heuristics.BaselineVariableHeuristic
 import model.Sudoku
+import model.SudokuField
 import model.SudokuProblem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,7 +21,7 @@ class CSPUnitTests
     @BeforeEach
     fun configureVariables()
     {
-        sudoku = Reader.getSudoku(3)
+        sudoku = Reader.getSudoku(0)
         sudokuProblem = SudokuProblem(sudoku, baselineValueHeuristic, baselineVariableHeuristic)
     }
 
@@ -74,10 +76,22 @@ class CSPUnitTests
     }
 
     @Test
-    fun testConstraintsSatisfaction()
+    fun testConstraintsSatisfactionWithDots()
     {
         assert(sudokuProblem.areConstraintsSatisfied())
+
+
     }
+
+    @Test
+    fun testConstraintsColumn()
+    {
+        val np = Reader.getSudoku(46)
+        val sp = SudokuProblem(np, baselineValueHeuristic, baselineVariableHeuristic)
+        assert(!sp.areConstraintsSatisfied())
+    }
+
+
 
     @Test
     fun testOneElementDomainVariable()
@@ -102,6 +116,17 @@ class CSPUnitTests
         sudokuProblem.backTrack()
 
         assert(firstValue == variable.getValue())
+    }
+
+    @Test
+    fun testEasySudokuSolving()
+    {
+        val answer = "625371948473985216819462753231794685547618329968523174196857432352146897784239561"
+        val answerList = answer.map { v -> v }
+
+        val flatSolution = CSPSolver.solveCSPNaive(sudokuProblem).platform.flatten()
+
+        assert(answerList == flatSolution)
     }
 
 }

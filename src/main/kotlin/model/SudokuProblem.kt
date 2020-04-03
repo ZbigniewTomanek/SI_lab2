@@ -33,7 +33,6 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
         this.fields = variables.toList()
         flattenFields = variables.flatten()
-        println(flattenFields)
     }
 
     private fun setVariableDefaultDomain(variable: Variable<Char>)
@@ -102,15 +101,15 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
     override fun areConstraintsSatisfied(): Boolean
     {
-        for (i in 0 until Sudoku.GRID_SIZE)
+        for (i in fields.indices)
         {
             val column = mutableListOf<SudokuField>()
             val square = mutableListOf<SudokuField>()
             val row = fields[i]
 
-            for (j in 0 until Sudoku.GRID_SIZE)
+            for (j in fields[i].indices)
             {
-                column.add(fields[i][j])
+                column.add(fields[j][i])
                 square.add(fields
                         [(i / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + j / Sudoku.SUBGRID_SIZE]
                         [i * Sudoku.SUBGRID_SIZE % Sudoku.GRID_SIZE + j % Sudoku.SUBGRID_SIZE])
