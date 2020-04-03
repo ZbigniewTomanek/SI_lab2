@@ -1,6 +1,6 @@
 package csp
 
-interface ValueHeuristic<T> // zapamiętać jakie były już użyte
+interface ValueHeuristic<T>
 {
     fun getNextValue(domain: List<T>): T
     fun hasNextValue(domain: List<T>): Boolean

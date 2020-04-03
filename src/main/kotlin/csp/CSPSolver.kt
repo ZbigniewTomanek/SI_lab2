@@ -15,10 +15,6 @@ object CSPSolver
 
         if (!variable.hasNextValue())
         {
-            problem.backTrack()
-            recurrencesOfLastRun++
-            currentVariable = problem.getPreviousVariable()
-
 
             if (!problem.hasPreviousVariable())
             {
@@ -26,6 +22,9 @@ object CSPSolver
             }
             else
             {
+                problem.backTrack()
+                recurrencesOfLastRun++
+                currentVariable = problem.getPreviousVariable()
 
                 findValueForVariable(problem, currentVariable)
             }
