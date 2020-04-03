@@ -10,6 +10,20 @@ class RandomVariableHeuristic<T> : VariableHeuristic<T>
         TODO("Not yet implemented")
     }
 
-    override fun hasNextVariable(variables: List<Variable<T>>): Boolean = variables.isNotEmpty()
+    override fun hasNextVariable(variables: List<Variable<T>>): Boolean
+    {
+        TODO("Not yet implemented")
+    }
+
+    override fun getPreviousVariable(variables: List<Variable<T>>): Variable<T>
+    {
+        TODO("Not yet implemented")
+    }
+
+    override fun hasPreviousVariable(variables: List<Variable<T>>): Boolean
+    {
+        TODO("Not yet implemented")
+    }
+
 
 }

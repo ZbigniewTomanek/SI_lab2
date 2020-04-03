@@ -6,17 +6,32 @@ import csp.Variable
 class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
     : Variable<Char>(valueHeuristic)
 {
-    private lateinit var domain: List<Char>
+    private lateinit var domain: MutableList<Char>
+
+    private val domainHistory = mutableListOf<MutableList<Char>>()
+    private var valueHistory = mutableListOf(value)
+
+
+    override fun backTrack()
+    {
+        this.value = valueHistory.removeAt(valueHistory.size - 2)
+        this.domain = domainHistory.removeAt(domainHistory.size - 2)
+    }
 
 
     override fun assignValue(value: Char)
     {
+        valueHistory.add(value)
+        domainHistory.add(domain)
+
         this.value = value
     }
 
     override fun getNextValue(): Char
     {
-        return valueHeuristic.getNextValue(domain)
+        val nextValue = valueHeuristic.getNextValue(domain)
+        domain.remove(nextValue)
+        return nextValue
     }
 
     override fun hasNextValue(): Boolean
@@ -26,7 +41,8 @@ class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
 
     override fun setDomain(domain: List<Char>)
     {
-        this.domain = domain
+        this.domain = domain.toMutableList()
+        domainHistory.add(this.domain)
     }
 
     override fun getValue(): Char = value

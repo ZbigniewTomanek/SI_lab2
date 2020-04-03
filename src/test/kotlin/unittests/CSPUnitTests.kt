@@ -4,7 +4,6 @@ import csp.Variable
 import csp.heuristics.BaselineValueHeuristic
 import csp.heuristics.BaselineVariableHeuristic
 import model.Sudoku
-import model.SudokuField
 import model.SudokuProblem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,23 +19,25 @@ class CSPUnitTests
     @BeforeEach
     fun configureVariables()
     {
-        sudoku = Reader.getSudoku(0)
+        sudoku = Reader.getSudoku(3)
         sudokuProblem = SudokuProblem(sudoku, baselineValueHeuristic, baselineVariableHeuristic)
     }
 
     @Test
     fun testBaselineValHeuristic()
     {
-        val domain = Sudoku.getDomainAsChar()
-        val returnedVariables = mutableListOf<Char>()
+        val variable = sudokuProblem.getNextVariable()
+        val returnedValues = mutableListOf<Char>()
 
-        while (baselineValueHeuristic.hasNextValue(domain))
+
+        while (variable.hasNextValue())
         {
-            val value = baselineValueHeuristic.getNextValue(domain)
-            returnedVariables.add(value)
+
+            val value = variable.getNextValue()
+            returnedValues.add(value)
         }
 
-        assert(domain == returnedVariables.toList())
+        assert(Sudoku.getDomainAsChar() == returnedValues.toList())
 
     }
 
@@ -62,9 +63,48 @@ class CSPUnitTests
     @Test
     fun testGettingPreviousVariable()
     {
-        val prevVar = sudokuProblem.getNextVariable()
-        sudokuProblem.getNextVariable()
 
-        assert(prevVar == sudokuProblem.getPreviousVariable())
+        val prevVar = sudokuProblem.getNextVariable()
+        println(prevVar)
+        println(sudokuProblem.getNextVariable())
+        val prevVar2 = sudokuProblem.getPreviousVariable()
+        println(prevVar2)
+
+        assert(prevVar == prevVar2)
     }
+
+    @Test
+    fun testConstraintsSatisfaction()
+    {
+        assert(sudokuProblem.areConstraintsSatisfied())
+    }
+
+    @Test
+    fun testOneElementDomainVariable()
+    {
+        var variable = sudokuProblem.getNextVariable()
+
+        while (sudokuProblem.hasNextVariable() && variable.getValue() == Sudoku.EMPTY_FIELD_REPR)
+        {
+            variable = sudokuProblem.getNextVariable()
+        }
+
+        assert(!variable.hasNextValue())
+    }
+
+    @Test
+    fun testBackTracking()
+    {
+        val variable = sudokuProblem.getNextVariable()
+        val firstValue = variable.getValue()
+        println(firstValue)
+
+        sudokuProblem.assignValueForVariable('1', variable)
+        sudokuProblem.backTrack()
+
+        println(variable.getValue())
+
+        assert(firstValue == variable.getValue())
+    }
+
 }

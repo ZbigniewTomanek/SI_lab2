@@ -5,16 +5,14 @@ import csp.ValueHeuristic
 import csp.Variable
 import csp.VariableHeuristic
 
-
-// sledzic liczbe nawrotow i liczbe przypisan
 class SudokuProblem(private val sudokuData: Sudoku,
                     private val valueHeuristic: ValueHeuristic<Char>,
                     variableHeuristic: VariableHeuristic<Char>)
     : CSPProblem<Char, Sudoku>(variableHeuristic)
 {
-    private lateinit var variables: List<List<SudokuField>>
-    private lateinit var remainingVariables: MutableList<SudokuField>
-    private val variableHistory: MutableList<SudokuField> = mutableListOf()
+    private lateinit var fields: List<List<SudokuField>>
+    private lateinit var flattenFields: List<SudokuField>
+    private lateinit var currentVariable: SudokuField
 
     init
     {
@@ -33,9 +31,9 @@ class SudokuProblem(private val sudokuData: Sudoku,
             variables.add(vRow)
         }
 
-        this.variables = variables.toList()
-        remainingVariables = variables.flatten().toMutableList()
-
+        this.fields = variables.toList()
+        flattenFields = variables.flatten()
+        println(flattenFields)
     }
 
     private fun setVariableDefaultDomain(variable: Variable<Char>)
@@ -56,7 +54,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
     {
         val solution = mutableListOf<List<Char>>()
 
-        for (row in variables)
+        for (row in fields)
         {
             val sRow = row.map { v -> v.getValue() }
             solution.add(sRow)
@@ -65,9 +63,17 @@ class SudokuProblem(private val sudokuData: Sudoku,
         return Sudoku(sudokuData.index, sudokuData.difficultyLevel, solution.toList())
     }
 
-    override fun hasPreviousVariable(): Boolean = variableHistory.size > 1
-
-    override fun getPreviousVariable(): Variable<Char> = variableHistory.removeAt(variableHistory.size - 2)
+    override fun getNextVariable(): Variable<Char> {
+        currentVariable = variableHeuristic.getNextVariable(flattenFields) as SudokuField
+        return currentVariable
+    }
+    override fun hasNextVariable(): Boolean = variableHeuristic.hasNextVariable(flattenFields)
+    override fun hasPreviousVariable(): Boolean = variableHeuristic.hasPreviousVariable(flattenFields)
+    override fun getPreviousVariable(): Variable<Char>
+    {
+        currentVariable = variableHeuristic.getPreviousVariable(flattenFields) as SudokuField
+        return currentVariable
+    }
 
 
     private fun validatePlatformPart(part: List<SudokuField>): Boolean
@@ -99,12 +105,12 @@ class SudokuProblem(private val sudokuData: Sudoku,
         {
             val column = mutableListOf<SudokuField>()
             val square = mutableListOf<SudokuField>()
-            val row = variables[i]
+            val row = fields[i]
 
             for (j in 0 until Sudoku.GRID_SIZE)
             {
-                column.add(variables[i][j])
-                square.add(variables
+                column.add(fields[i][j])
+                square.add(fields
                         [(i / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + j / Sudoku.SUBGRID_SIZE]
                         [i * Sudoku.SUBGRID_SIZE % Sudoku.GRID_SIZE + j % Sudoku.SUBGRID_SIZE])
             }
@@ -119,21 +125,20 @@ class SudokuProblem(private val sudokuData: Sudoku,
         return true
     }
 
-
-
-    override fun getNextVariable(): Variable<Char>
-    {
-        val takenVariable = variableHeuristic.getNextVariable(remainingVariables)
-        variableHistory.add(takenVariable as SudokuField)
-        return takenVariable
-    }
-
-    override fun hasNextVariable(): Boolean = variableHeuristic.hasNextVariable(remainingVariables)
-
     override fun assignValueForVariable(value: Char, variable: Variable<Char>)
     {
         variable.assignValue(value)
     }
 
     override fun toString() = "Sudoku problem nr ${sudokuData.index}, diff: ${sudokuData.difficultyLevel}"
+    override fun assignValueForVariable(variable: Variable<Char>, value: Char)
+
+    {
+        variable.assignValue(value)
+    }
+
+    override fun backTrack()
+    {
+        currentVariable.backTrack()
+    }
 }

@@ -2,18 +2,18 @@ package csp.heuristics
 
 import csp.Variable
 import csp.VariableHeuristic
-import model.SudokuField
+
 
 class BaselineVariableHeuristic : VariableHeuristic<Char>
 {
-    private val variablesUsed: MutableSet<Variable<Char>> = mutableSetOf()
+    private var currentVariable = -1
 
-    override fun getNextVariable(variables: List<Variable<Char>>): Variable<Char>
-    {
-        val toTake = variables.first { v -> v !in variablesUsed }
-        variablesUsed.add(toTake)
-        return toTake
-    }
+    override fun getNextVariable(variables: List<Variable<Char>>): Variable<Char> = variables[++currentVariable]
 
-    override fun hasNextVariable(variables: List<Variable<Char>>): Boolean = variables.any { v -> v !in variablesUsed }
+    override fun hasNextVariable(variables: List<Variable<Char>>): Boolean = currentVariable < variables.size - 1
+
+    override fun getPreviousVariable(variables: List<Variable<Char>>): Variable<Char> = variables[--currentVariable]
+
+    override fun hasPreviousVariable(variables: List<Variable<Char>>) = currentVariable > 0
+
 }

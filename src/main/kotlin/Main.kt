@@ -6,12 +6,12 @@ import utils.Reader
 
 fun main()
 {
-    val sudoku = Reader.getSudoku(3)
+    val sudoku = Reader.getSudoku(0)
     val valueHeuristic = BaselineValueHeuristic()
     val variableHeuristic = BaselineVariableHeuristic()
 
     val problem = SudokuProblem(sudoku, valueHeuristic, variableHeuristic)
-    CSPSolver.findCSPSolution(problem)
+    CSPSolver.solveCSPNaive(problem)
 
     println(problem.areConstraintsSatisfied())
 }
