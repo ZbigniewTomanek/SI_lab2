@@ -1,26 +1,21 @@
 package csp
 
-import java.lang.Exception
-
-class InsolvableProblemException(msg: String) : Exception(msg)
-
 object CSPSolver
 {
     var assignmentsOfLastRun = 0
     var recurrencesOfLastRun = 0
 
-    private fun <T, S> findValueForVariable(problem: CSPProblem<T, S>, variable: Variable<T>)
+    private fun <T, S> findValueForVariable(problem: CSPProblem<T, S>, variable: Variable<T>): Boolean
     {
         var currentVariable = variable
 
         if (!variable.hasNextValue())
         {
 
-            if (!problem.hasPreviousVariable())
+            return if (!problem.hasPreviousVariable())
             {
-                throw InsolvableProblemException("Problem $problem is insolvable")
-            }
-            else
+                true
+            } else
             {
                 problem.backTrack()
                 recurrencesOfLastRun++
@@ -35,9 +30,9 @@ object CSPSolver
             assignmentsOfLastRun++
             problem.assignValueForVariable(value, variable)
 
-            if (problem.areConstraintsSatisfied())
+            return if (problem.areConstraintsSatisfied())
             {
-                return
+                false
             }
             else
             {
@@ -47,26 +42,37 @@ object CSPSolver
 
     }
 
-    private fun <T, S> findCSPSolution(problem: CSPProblem<T, S>): S
+    private fun <T, S> findCSPSolution(problem: CSPProblem<T, S>): List<S>
     {
         var currentVariable: Variable<T>
+        val solutions = mutableListOf<S>()
+        var foundAllSolutions = false
 
-        while (true)
+        while (!foundAllSolutions)
         {
-
             if (!problem.hasNextVariable())
             {
-                println("Znaleziono rozwiaznie")
-                break
+                println("solution")
+                val solution = problem.getSolution()
+                solutions.add(solution)
+
+                problem.backTrack()
+                recurrencesOfLastRun++
+                currentVariable = problem.getPreviousVariable()
+                foundAllSolutions = findValueForVariable(problem, currentVariable)
+
             }
-            currentVariable = problem.getNextVariable()
-            findValueForVariable(problem, currentVariable)
+            else
+            {
+                currentVariable = problem.getNextVariable()
+                foundAllSolutions = findValueForVariable(problem, currentVariable)
+            }
         }
 
-        return problem.getSolution()
+        return solutions.toList()
     }
 
-    fun <T, S> solveCSPNaive(problem: CSPProblem<T, S>) : S
+    fun <T, S> solveCSPNaive(problem: CSPProblem<T, S>) : List<S>
     {
         assignmentsOfLastRun = 0
         recurrencesOfLastRun = 0

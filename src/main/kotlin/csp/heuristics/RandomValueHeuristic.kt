@@ -1,17 +1,16 @@
 package csp.heuristics
 
 import csp.ValueHeuristic
+import kotlin.random.Random
 
 class RandomValueHeuristic : ValueHeuristic<Char>
 {
-    private val valuesUsed: MutableSet<Char> = mutableSetOf()
+    val random = Random(System.currentTimeMillis())
     override fun getNextValue(domain: List<Char>): Char
     {
-        TODO("Not yet implemented")
+        val index = random.nextInt(domain.size)
+        return domain[index]
     }
 
-    override fun hasNextValue(domain: List<Char>): Boolean
-    {
-        TODO("Not yet implemented")
-    }
+    override fun hasNextValue(domain: List<Char>): Boolean = domain.isNotEmpty()
 }

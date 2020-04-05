@@ -3,6 +3,8 @@ import csp.ValueHeuristic
 import csp.VariableHeuristic
 import csp.heuristics.BaselineValueHeuristic
 import csp.heuristics.BaselineVariableHeuristic
+import csp.heuristics.RandomValueHeuristic
+import csp.heuristics.RandomVariableHeuristic
 import model.SudokuProblem
 import utils.Reader
 
@@ -34,16 +36,33 @@ fun solveSudoku(index: Int, valueHeuristic: ValueHeuristic<Char>, variableHeuris
     println(sudoku)
     sudoku.printPlatform()
     val problem = SudokuProblem(sudoku, valueHeuristic, variableHeuristic)
-    val solution = CSPSolver.solveCSPNaive(problem)
+
+    val t1 = System.currentTimeMillis()
+    val solutions = CSPSolver.solveCSPNaive(problem)
+    val t2 = System.currentTimeMillis()
+
     println("Recurrences: ${CSPSolver.recurrencesOfLastRun}, Assignments: ${CSPSolver.assignmentsOfLastRun}")
-    println("After")
-    solution.printPlatform()
+
+    if (solutions.isEmpty())
+    {
+        println("This problem has no solutions")
+        return
+    }
+
+    println("${solutions.size} solutions found in ${(t2 - t1)/1000f}s")
+
+    for (i in solutions.indices)
+    {
+        println("Solution ${i+1}")
+        solutions[i].printPlatform()
+        println()
+    }
 }
 
 fun main()
 {
     val valueHeuristic = BaselineValueHeuristic()
     val variableHeuristic = BaselineVariableHeuristic()
-    //solveSudoku(2, valueHeuristic, variableHeuristic)
-    checkHowManyCrashes()
+    solveSudoku(0, valueHeuristic, variableHeuristic)
+    //checkHowManyCrashes()
 }
