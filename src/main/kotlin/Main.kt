@@ -8,27 +8,6 @@ import csp.heuristics.RandomVariableHeuristic
 import model.SudokuProblem
 import utils.Reader
 
-private fun checkHowManyCrashes()
-{
-    var crashes = 0
-    for (i in 0 until 44)
-    {
-        val valueHeuristic = BaselineValueHeuristic()
-        val variableHeuristic = BaselineVariableHeuristic()
-
-        try
-        {
-            solveSudoku(i, valueHeuristic, variableHeuristic)
-        } catch (e: Exception)
-        {
-            crashes++
-        }
-
-    }
-
-    println("Solver has crashed $crashes times")
-}
-
 fun solveSudoku(index: Int, valueHeuristic: ValueHeuristic<Char>, variableHeuristic: VariableHeuristic<Char>)
 {
     val sudoku = Reader.getSudoku(index)

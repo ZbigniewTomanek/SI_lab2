@@ -19,4 +19,7 @@ abstract class CSPProblem<T, S>(
 
     abstract fun assignValueForVariable(variable: Variable<T>, value: T)
     abstract fun backTrack()
+
+    abstract fun checkForward()
+    abstract fun fcBackTrack()
 }

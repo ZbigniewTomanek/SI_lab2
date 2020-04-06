@@ -4,6 +4,8 @@ import csp.CSPProblem
 import csp.ValueHeuristic
 import csp.Variable
 import csp.VariableHeuristic
+import java.lang.reflect.Field
+import java.util.*
 
 class SudokuProblem(private val sudokuData: Sudoku,
                     private val valueHeuristic: ValueHeuristic<Char>,
@@ -13,6 +15,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
     private lateinit var fields: List<List<SudokuField>>
     private lateinit var flattenFields: List<SudokuField>
     private lateinit var currentVariable: SudokuField
+    private val correlatedFieldsHistory = Stack<List<SudokuField>>()
 
     init
     {
@@ -24,11 +27,17 @@ class SudokuProblem(private val sudokuData: Sudoku,
         val platform = sudokuData.platform
         val variables = mutableListOf<List<SudokuField>>()
 
-        for (row in platform)
-        {
-            val vRow: List<SudokuField> = row.map { v -> SudokuField(v, valueHeuristic) }
+        for (i in platform.indices)
+        {   val vRow = mutableListOf<SudokuField>()
+
+            for (j in platform[i].indices)
+            {
+                val sf = SudokuField(platform[i][j], i, j, valueHeuristic)
+                vRow.add(sf)
+            }
+
             vRow.forEach { v -> designateVariableDomain(v) }
-            variables.add(vRow)
+            variables.add(vRow.toList())
         }
 
         this.fields = variables.toList()
@@ -42,6 +51,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
             listOf(vValue)
         else
             Sudoku.getDomainAsChar()
+
         variable.setDomain(vDomain)
     }
     override fun designateVariableDomain(variable: Variable<Char>)
@@ -73,6 +83,26 @@ class SudokuProblem(private val sudokuData: Sudoku,
     {
         currentVariable = variableHeuristic.getPreviousVariable(flattenFields) as SudokuField
         return currentVariable
+    }
+
+    fun getCorrelatedFields(field: SudokuField): List<SudokuField>
+    {
+        val fieldX = field.posX
+        val fieldY = field.posY
+
+        val relatedFields = mutableSetOf<SudokuField>()
+
+        for (i in fields[fieldX].indices)
+        {
+            relatedFields.add(fields[i][fieldY])
+            relatedFields.add(fields
+                    [(fieldX / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + i / Sudoku.SUBGRID_SIZE]
+                    [fieldX * Sudoku.SUBGRID_SIZE % Sudoku.GRID_SIZE + i % Sudoku.SUBGRID_SIZE])
+        }
+
+        fields[fieldX].forEach { f -> relatedFields.add(f) }
+
+        return relatedFields.filter { f -> f.getValue() == Sudoku.EMPTY_FIELD_REPR }
     }
 
 
@@ -139,6 +169,26 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
     override fun backTrack()
     {
+        currentVariable.backTrack()
+    }
+
+    override fun checkForward()
+    {
+        val value = currentVariable.getValue()
+        val correlatedFields = getCorrelatedFields(currentVariable)
+
+        correlatedFieldsHistory.push(correlatedFields)
+
+        for (field in correlatedFields)
+        {
+            field.filterDomain(value)
+        }
+    }
+
+    override fun fcBackTrack()
+    {
+        val correlatedFields = correlatedFieldsHistory.pop()
+        correlatedFields.forEach { f -> f.backTrackDomain() }
         currentVariable.backTrack()
     }
 }

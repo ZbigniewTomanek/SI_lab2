@@ -3,12 +3,13 @@ package model
 import csp.ValueHeuristic
 import csp.Variable
 
-class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
+class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHeuristic: ValueHeuristic<Char>)
     : Variable<Char>(valueHeuristic)
 {
     private lateinit var domain: MutableList<Char>
 
     private val domainHistory = mutableListOf<MutableList<Char>>()
+    private val fcDomainHistory = mutableListOf<MutableList<Char>>()
     private var valueHistory = mutableListOf<Char>()
 
 
@@ -51,5 +52,33 @@ class SudokuField(private var value: Char, valueHeuristic: ValueHeuristic<Char>)
 
     override fun getValue(): Char = value
 
-    override fun toString() = "Var(val: $value, domain: $domain)"
+    override fun hasEmptyDomain(): Boolean = domain.isEmpty()
+    override fun backTrackDomain()
+    {
+        domain = fcDomainHistory.removeAt(fcDomainHistory.size - 1)
+    }
+
+    override fun filterDomain(valuesToFilter: Char)
+    {
+        fcDomainHistory.add(domain)
+        domain.remove(value)
+    }
+
+    override fun toString() = "Var(val: $value, pos: ($posX, $posY)domain: $domain)"
+
+    override fun hashCode(): Int = posX * 10 + posY
+
+    override fun equals(other: Any?): Boolean
+    {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SudokuField
+
+        if (value != other.value) return false
+        if (posX != other.posX) return false
+        if (posY != other.posY) return false
+
+        return true
+    }
 }

@@ -10,7 +10,10 @@ abstract class Variable<T>(val valueHeuristic: ValueHeuristic<T>)
 
     abstract fun setDomain(domain: List<T>)
     abstract fun getDomain(): List<T>
+    abstract fun filterDomain(value: T)
+    abstract fun hasEmptyDomain(): Boolean
 
     abstract fun backTrack()
+    abstract fun backTrackDomain()
     abstract fun memorizeState()
 }

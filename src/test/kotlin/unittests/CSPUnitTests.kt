@@ -124,9 +124,20 @@ class CSPUnitTests
         val answer = "625371948473985216819462753231794685547618329968523174196857432352146897784239561"
         val answerList = answer.map { v -> v }
 
-        val flatSolution = CSPSolver.solveCSPNaive(sudokuProblem).platform.flatten()
+        val flatSolution = CSPSolver.solveCSPNaive(sudokuProblem)[0].platform.flatten()
 
         assert(answerList == flatSolution)
+    }
+
+    @Test
+    fun testGettingCorrelatedFields()
+    {
+        val sudoku = sudokuProblem.getSolution()
+        sudoku.printPlatform()
+        val field = sudokuProblem.getNextVariable() as SudokuField
+        println(field)
+        val fields = sudokuProblem.getCorrelatedFields(field).map { v -> "(${v.posX}, ${v.posY})"}
+        println(fields)
     }
 
 }
