@@ -1,9 +1,10 @@
 package unittests
 
 import csp.CSPSolver
+import csp.ValueHeuristic
 import csp.Variable
-import csp.heuristics.BaselineValueHeuristic
-import csp.heuristics.BaselineVariableHeuristic
+import csp.VariableHeuristic
+import csp.heuristics.*
 import model.Sudoku
 import model.SudokuField
 import model.SudokuProblem
@@ -15,8 +16,8 @@ class CSPUnitTests
 {
     lateinit var sudokuProblem: SudokuProblem
     lateinit var sudoku: Sudoku
-    private val baselineVariableHeuristic: BaselineVariableHeuristic = BaselineVariableHeuristic()
-    private val baselineValueHeuristic: BaselineValueHeuristic = BaselineValueHeuristic()
+    private val baselineVariableHeuristic: VariableHeuristic<Char> = LeastLimitingVariableHeuristic()
+    private val baselineValueHeuristic: ValueHeuristic<Char> = RandomValueHeuristic()
 
     @BeforeEach
     fun configureVariables()
@@ -41,18 +42,19 @@ class CSPUnitTests
             returnedValues.add(value)
         }
 
-        assert(Sudoku.getDomainAsChar() == returnedValues.toList())
+        assert(Sudoku.getDomainAsChar().toSet() == returnedValues.toSet())
 
     }
 
     @Test
     fun testBaselineVarHeuristic()
     {
+        val sp = SudokuProblem(sudoku, BaselineValueHeuristic(), BaselineVariableHeuristic())
         val returnedVars = mutableListOf<Variable<Char>>()
 
-        while (sudokuProblem.hasNextVariable())
+        while (sp.hasNextVariable())
         {
-            val retVar = sudokuProblem.getNextVariable()
+            val retVar = sp.getNextVariable()
             returnedVars.add(retVar)
         }
 
@@ -68,14 +70,37 @@ class CSPUnitTests
     fun testGettingPreviousVariable()
     {
 
-        val prevVar = sudokuProblem.getNextVariable()
-        println(prevVar)
-        println(sudokuProblem.getNextVariable())
-        val prevVar2 = sudokuProblem.getPreviousVariable()
-        println(prevVar2)
+        val firstVar = sudokuProblem.getNextVariable()
+        var variable: Variable<Char>? = null
 
-        assert(prevVar == prevVar2)
+        while (sudokuProblem.hasNextVariable())
+        {
+            variable = sudokuProblem.getNextVariable()
+            println(variable)
+        }
+
+        println()
+
+        while (sudokuProblem.hasPreviousVariable())
+        {
+            variable = sudokuProblem.getPreviousVariable() as SudokuField
+            println(variable)
+        }
+
+        assert(firstVar == variable!!)
     }
+
+    @Test
+    fun testGettingNextVar()
+    {
+        for (i in 0 until 81)
+        {
+            sudokuProblem.getNextVariable()
+        }
+
+        assert(!sudokuProblem.hasNextVariable())
+    }
+
 
     @Test
     fun testConstraintsSatisfactionWithDots()
@@ -92,7 +117,6 @@ class CSPUnitTests
         val sp = SudokuProblem(np, baselineValueHeuristic, baselineVariableHeuristic)
         assert(!sp.areConstraintsSatisfied())
     }
-
 
 
     @Test
@@ -121,7 +145,6 @@ class CSPUnitTests
         assert(firstValue == variable.getValue())
     }
 
-    @Test
     fun testEasySudokuSolving()
     {
         val answer = "625371948473985216819462753231794685547618329968523174196857432352146897784239561"
@@ -146,10 +169,13 @@ class CSPUnitTests
     @Test
     fun testForwardChecking()
     {
-        sudokuProblem.getNextVariable()
-        val firstVar = sudokuProblem.getNextVariable()
-        val correlatedFields = sudokuProblem.getCorrelatedFields(firstVar as SudokuField)
-        val value = firstVar.getValue()
+        var variable = sudokuProblem.getNextVariable()
+        while (sudokuProblem.hasNextVariable() && variable.getValue() == Sudoku.EMPTY_FIELD_REPR)
+        {
+            variable = sudokuProblem.getNextVariable()
+        }
+        val correlatedFields = sudokuProblem.getCorrelatedFields(variable as SudokuField)
+        val value = variable.getValue()
 
         sudokuProblem.checkForward()
 

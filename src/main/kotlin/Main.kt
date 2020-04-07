@@ -1,14 +1,15 @@
 import csp.CSPSolver
 import csp.ValueHeuristic
 import csp.VariableHeuristic
-import csp.heuristics.BaselineValueHeuristic
-import csp.heuristics.BaselineVariableHeuristic
-import csp.heuristics.RandomValueHeuristic
-import csp.heuristics.RandomVariableHeuristic
+import csp.heuristics.*
 import model.SudokuProblem
 import utils.Reader
 
-fun solveSudoku(index: Int, valueHeuristic: ValueHeuristic<Char>, variableHeuristic: VariableHeuristic<Char>)
+fun solveSudoku
+            (index: Int, valueHeuristic:
+            ValueHeuristic<Char>,
+             variableHeuristic: VariableHeuristic<Char>,
+             checkForward: Boolean = false)
 {
     val sudoku = Reader.getSudoku(index)
     println("Before")
@@ -17,8 +18,9 @@ fun solveSudoku(index: Int, valueHeuristic: ValueHeuristic<Char>, variableHeuris
     val problem = SudokuProblem(sudoku, valueHeuristic, variableHeuristic)
 
     val t1 = System.currentTimeMillis()
-    val solutions = CSPSolver.solveCSPNaive(problem)
+    val solutions = if (checkForward) CSPSolver.solveCSPForwardChecking(problem) else CSPSolver.solveCSPNaive(problem)
     val t2 = System.currentTimeMillis()
+    println(problem.getNextVariable())
 
     println("Recurrences: ${CSPSolver.recurrencesOfLastRun}, Assignments: ${CSPSolver.assignmentsOfLastRun}")
 
@@ -42,6 +44,6 @@ fun main()
 {
     val valueHeuristic = BaselineValueHeuristic()
     val variableHeuristic = BaselineVariableHeuristic()
-    solveSudoku(0, valueHeuristic, variableHeuristic)
+    solveSudoku(42, valueHeuristic, variableHeuristic)
     //checkHowManyCrashes()
 }

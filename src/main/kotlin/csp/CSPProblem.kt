@@ -22,4 +22,5 @@ abstract class CSPProblem<T, S>(
 
     abstract fun checkForward()
     abstract fun fcBackTrack()
+    abstract fun isAnyFilteredDomainEmpty(): Boolean
 }

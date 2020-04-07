@@ -15,5 +15,6 @@ abstract class Variable<T>(val valueHeuristic: ValueHeuristic<T>)
 
     abstract fun backTrack()
     abstract fun backTrackDomain()
+    abstract fun memorizeDomain()
     abstract fun memorizeState()
 }

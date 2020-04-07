@@ -163,7 +163,6 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
     override fun toString() = "Sudoku problem nr ${sudokuData.index}, diff: ${sudokuData.difficultyLevel}"
     override fun assignValueForVariable(variable: Variable<Char>, value: Char)
-
     {
         variable.assignValue(value)
     }
@@ -191,5 +190,10 @@ class SudokuProblem(private val sudokuData: Sudoku,
         val correlatedFields = correlatedFieldsHistory.pop()
         correlatedFields.forEach { f -> f.backTrackDomain() }
         currentVariable.backTrack()
+    }
+
+    override fun isAnyFilteredDomainEmpty(): Boolean {
+        val correlatedFields = correlatedFieldsHistory.peek()
+        return correlatedFields.any { f -> f.hasEmptyDomain() }
     }
 }

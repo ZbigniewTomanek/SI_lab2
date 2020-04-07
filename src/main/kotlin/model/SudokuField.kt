@@ -10,7 +10,7 @@ class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHe
     private lateinit var domain: MutableList<Char>
 
     private val domainHistory = Stack<MutableList<Char>>()
-    private val fcDomainHistory = Stack<Char>()
+    private val fcDomainHistory = Stack<MutableList<Char>>()
     private var valueHistory = Stack<Char>()
 
 
@@ -54,14 +54,20 @@ class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHe
     override fun getValue(): Char = value
 
     override fun hasEmptyDomain(): Boolean = domain.isEmpty()
+
     override fun backTrackDomain()
     {
-        domain.add(fcDomainHistory.pop())
+        domain = fcDomainHistory.pop()
+    }
+
+    override fun memorizeDomain()
+    {
+
     }
 
     override fun filterDomain(value: Char)
     {
-        fcDomainHistory.push(value)
+        fcDomainHistory.push(domain.toMutableList())
         domain.remove(value)
     }
 
