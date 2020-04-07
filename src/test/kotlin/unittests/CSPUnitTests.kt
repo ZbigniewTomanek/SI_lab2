@@ -28,9 +28,11 @@ class CSPUnitTests
     @Test
     fun testBaselineValHeuristic()
     {
+        sudokuProblem.getNextVariable()
+        sudokuProblem.getNextVariable()
+        sudokuProblem.getNextVariable()
         val variable = sudokuProblem.getNextVariable()
         val returnedValues = mutableListOf<Char>()
-
 
         while (variable.hasNextValue())
         {
@@ -103,6 +105,7 @@ class CSPUnitTests
             variable = sudokuProblem.getNextVariable()
         }
 
+        variable.getNextValue()
         assert(!variable.hasNextValue())
     }
 
@@ -138,6 +141,21 @@ class CSPUnitTests
         println(field)
         val fields = sudokuProblem.getCorrelatedFields(field).map { v -> "(${v.posX}, ${v.posY})"}
         println(fields)
+    }
+
+    @Test
+    fun testForwardChecking()
+    {
+        sudokuProblem.getNextVariable()
+        val firstVar = sudokuProblem.getNextVariable()
+        val correlatedFields = sudokuProblem.getCorrelatedFields(firstVar as SudokuField)
+        val value = firstVar.getValue()
+
+        sudokuProblem.checkForward()
+
+        correlatedFields.forEach { f -> assert(value !in f.getDomain()) }
+        sudokuProblem.fcBackTrack()
+        correlatedFields.forEach { f -> assert(value in f.getDomain()) }
     }
 
 }

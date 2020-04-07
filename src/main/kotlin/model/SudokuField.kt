@@ -2,27 +2,28 @@ package model
 
 import csp.ValueHeuristic
 import csp.Variable
+import java.util.*
 
 class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHeuristic: ValueHeuristic<Char>)
     : Variable<Char>(valueHeuristic)
 {
     private lateinit var domain: MutableList<Char>
 
-    private val domainHistory = mutableListOf<MutableList<Char>>()
-    private val fcDomainHistory = mutableListOf<MutableList<Char>>()
-    private var valueHistory = mutableListOf<Char>()
+    private val domainHistory = Stack<MutableList<Char>>()
+    private val fcDomainHistory = Stack<Char>()
+    private var valueHistory = Stack<Char>()
 
 
     override fun backTrack()
     {
-        this.value = valueHistory.removeAt(valueHistory.size - 1)
-        this.domain = domainHistory.removeAt(domainHistory.size - 1)
+        this.value = valueHistory.pop()
+        this.domain = domainHistory.pop()
     }
 
     override fun memorizeState()
     {
-        domainHistory.add(domain.toMutableList())
-        valueHistory.add(value)
+        domainHistory.push(domain.toMutableList())
+        valueHistory.push(value)
     }
 
 
@@ -55,12 +56,12 @@ class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHe
     override fun hasEmptyDomain(): Boolean = domain.isEmpty()
     override fun backTrackDomain()
     {
-        domain = fcDomainHistory.removeAt(fcDomainHistory.size - 1)
+        domain.add(fcDomainHistory.pop())
     }
 
-    override fun filterDomain(valuesToFilter: Char)
+    override fun filterDomain(value: Char)
     {
-        fcDomainHistory.add(domain)
+        fcDomainHistory.push(value)
         domain.remove(value)
     }
 

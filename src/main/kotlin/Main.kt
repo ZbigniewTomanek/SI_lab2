@@ -28,7 +28,7 @@ fun solveSudoku(index: Int, valueHeuristic: ValueHeuristic<Char>, variableHeuris
         return
     }
 
-    println("${solutions.size} solutions found in ${(t2 - t1)/1000f}s")
+    println("${solutions.size} solutions found in ${(t2 - t1)/1000f}s\n")
 
     for (i in solutions.indices)
     {

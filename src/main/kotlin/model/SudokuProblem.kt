@@ -77,6 +77,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
         currentVariable.memorizeState()
         return currentVariable
     }
+
     override fun hasNextVariable(): Boolean = variableHeuristic.hasNextVariable(flattenFields)
     override fun hasPreviousVariable(): Boolean = variableHeuristic.hasPreviousVariable(flattenFields)
     override fun getPreviousVariable(): Variable<Char>
