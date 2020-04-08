@@ -120,6 +120,7 @@ data class Sudoku(val index: Int, val difficultyLevel: Float, val platform: List
             }
 
             fields[posX].forEach { f -> relatedFields.add(f) }
+            relatedFields.remove(field)
             return relatedFields.filter { f -> f.getValue() == EMPTY_FIELD_REPR }
         }
     }

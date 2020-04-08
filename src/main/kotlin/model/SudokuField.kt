@@ -11,7 +11,8 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     private val domainHistory = Stack<MutableList<Int>>()
     private val fcDomainHistory = Stack<MutableList<Int>>()
-    private var valueHistory = Stack<Int>()
+    private val valueHistory = Stack<Int>()
+    private val recentlyRemovedValues = Stack<Int>()
 
     /*
     ----------------
@@ -21,9 +22,7 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun getNextValue(): Int
     {
-        val nextValue = valueHeuristic.getNextValue(domain)
-        domain.remove(nextValue)
-        return nextValue
+        return valueHeuristic.getNextValue(domain)
     }
 
     override fun hasNextValue(): Boolean
@@ -33,6 +32,7 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun assignValue(value: Int)
     {
+        domain.remove(value)
         this.value = value
     }
 
@@ -80,13 +80,18 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun memorizeDomain()
     {
-
+        fcDomainHistory.push(domain.toMutableList())
     }
 
     override fun filterDomain(value: Int)
     {
-        fcDomainHistory.push(domain.toMutableList())
+        recentlyRemovedValues.push(value)
         domain.remove(value)
+    }
+
+    override fun recoverDomainElement()
+    {
+        domain.add(recentlyRemovedValues.pop())
     }
 
     /*
@@ -112,4 +117,5 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
         return true
     }
+
 }

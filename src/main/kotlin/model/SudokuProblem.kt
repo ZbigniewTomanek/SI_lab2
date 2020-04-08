@@ -12,7 +12,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
                     variableHeuristic: VariableHeuristic<Int>)
     : CSPProblem<Int, Sudoku>(variableHeuristic)
 {
-    private lateinit var fields: List<List<SudokuField>>
+    lateinit var fields: List<List<SudokuField>>
     private lateinit var flattenFields: List<SudokuField>
     private lateinit var currentVariable: SudokuField
     private val correlatedFieldsHistory = Stack<List<SudokuField>>()
@@ -130,14 +130,33 @@ class SudokuProblem(private val sudokuData: Sudoku,
     override fun checkForward()
     {
         val value = currentVariable.getValue()
-        val correlatedFields = getCorrelatedFields(currentVariable, fields)
-
-        correlatedFieldsHistory.push(correlatedFields)
+        val correlatedFields = correlatedFieldsHistory.peek()
 
         for (field in correlatedFields)
         {
             field.filterDomain(value)
         }
+    }
+
+    /*
+    ----------------
+    FC backtracking
+    ----------------
+     */
+
+    override fun backTrackFiltering()
+    {
+        val correlatedFields = correlatedFieldsHistory.peek()
+        correlatedFields.forEach { f -> f.recoverDomainElement() }
+    }
+
+    override fun saveCorrelatedVarsDomainsState()
+    {
+        val correlatedFields = getCorrelatedFields(currentVariable, fields)
+
+        correlatedFields.forEach { f -> f.memorizeDomain() }
+
+        correlatedFieldsHistory.push(correlatedFields)
     }
 
     override fun fcBackTrack()

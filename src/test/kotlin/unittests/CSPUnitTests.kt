@@ -154,16 +154,20 @@ class CSPUnitTests
         assert(answerList == flatSolution)
     }
 
-//    @Test
-//    fun testGettingCorrelatedFields()
-//    {
-//        val sudoku = sudokuProblem.getSolution()
-//        sudoku.printPlatform()
-//        val field = sudokuProblem.getNextVariable() as SudokuField
-//        println(field)
-//        val fields = sudokuProblem.getCorrelatedFields(field).map { v -> v.getValue()}
-//        println(fields)
-//    }
+    @Test
+    fun testGettingCorrelatedFields()
+    {
+        var field: SudokuField
+        while (sudokuProblem.hasNextVariable())
+        {
+            field = sudokuProblem.getNextVariable() as SudokuField
+            val fields = Sudoku.getCorrelatedFields(field, sudokuProblem.fields)
+            println(field)
+            println(fields)
+            println()
+            assert(field !in fields)
+        }
+    }
 
     @Test
     fun testMakingCorrectMove()

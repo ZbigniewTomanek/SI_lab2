@@ -18,7 +18,9 @@ abstract class CSPProblem<T, S>(
     abstract fun assignValueForVariable(variable: Variable<T>, value: T)
     abstract fun backTrack()
 
+    abstract fun saveCorrelatedVarsDomainsState()
     abstract fun checkForward()
     abstract fun fcBackTrack()
+    abstract fun backTrackFiltering()
     abstract fun isAnyFilteredDomainEmpty(): Boolean
 }

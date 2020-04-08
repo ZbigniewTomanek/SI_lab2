@@ -5,9 +5,16 @@ object CSPSolver
     var assignmentsOfLastRun = 0
     var recurrencesOfLastRun = 0
 
+    private fun <T, S> nBackTrack(problem: CSPProblem<T, S>): Boolean
+    {
+        problem.backTrack()
+        recurrencesOfLastRun++
+
+        return findValueForVariable(problem, problem.getPreviousVariable())
+    }
+
     private fun <T, S> findValueForVariable(problem: CSPProblem<T, S>, variable: Variable<T>): Boolean
     {
-        var currentVariable = variable
 
         if (!variable.hasNextValue())
         {
@@ -18,11 +25,7 @@ object CSPSolver
             }
             else
             {
-                problem.backTrack()
-                recurrencesOfLastRun++
-                currentVariable = problem.getPreviousVariable()
-
-                findValueForVariable(problem, currentVariable)
+                nBackTrack(problem)
             }
         }
         else
@@ -37,7 +40,7 @@ object CSPSolver
             }
             else
             {
-                findValueForVariable(problem, currentVariable)
+                findValueForVariable(problem, variable)
             }
         }
 
@@ -57,10 +60,7 @@ object CSPSolver
                 val solution = problem.getSolution()
                 solutions.add(solution)
 
-                problem.backTrack()
-                recurrencesOfLastRun++
-                currentVariable = problem.getPreviousVariable()
-                foundAllSolutions = findValueForVariable(problem, currentVariable)
+                foundAllSolutions = nBackTrack(problem)
 
             }
             else
@@ -81,41 +81,41 @@ object CSPSolver
         return findCSPSolution(problem)
     }
 
+    private fun <T, S> fcBackTrack(problem: CSPProblem<T, S>): Boolean
+    {
+        recurrencesOfLastRun++
+        problem.fcBackTrack()
+        return findValueForVariableForwardChecking(problem, problem.getPreviousVariable())
+    }
+
     private fun <T, S> findValueForVariableForwardChecking(problem: CSPProblem<T, S>, variable: Variable<T>): Boolean
     {
-        var currentVariable = variable
-
         if (!variable.hasNextValue())
         {
-
-            return if (!problem.hasPreviousVariable())
+            return if (problem.hasPreviousVariable())
             {
-                true
+                fcBackTrack(problem)
             } else
             {
-                problem.backTrack()
-                recurrencesOfLastRun++
-                currentVariable = problem.getPreviousVariable()
-
-                findValueForVariableForwardChecking(problem, currentVariable)
+                true
             }
-        }
-        else
+
+        } else
         {
-            val value = variable.getNextValue()
             assignmentsOfLastRun++
+            val value = variable.getNextValue()
             problem.assignValueForVariable(value, variable)
+            problem.checkForward()
 
-            return if (problem.areConstraintsSatisfied())
+            return if (!problem.areConstraintsSatisfied())
             {
-                false
-            }
-            else
+                //problem.backTrackFiltering()
+                findValueForVariableForwardChecking(problem, variable)
+            } else
             {
-                findValueForVariableForwardChecking(problem, currentVariable)
+                return false
             }
         }
-
     }
 
     private fun <T, S> findCSPSolutionForwardChecking(problem: CSPProblem<T, S>): List<S>
@@ -132,15 +132,12 @@ object CSPSolver
                 val solution = problem.getSolution()
                 solutions.add(solution)
 
-                problem.backTrack()
-                recurrencesOfLastRun++
-                currentVariable = problem.getPreviousVariable()
-                foundAllSolutions = findValueForVariableForwardChecking(problem, currentVariable)
-
+                foundAllSolutions = fcBackTrack(problem)
             }
             else
             {
                 currentVariable = problem.getNextVariable()
+                problem.saveCorrelatedVarsDomainsState()
                 foundAllSolutions = findValueForVariableForwardChecking(problem, currentVariable)
             }
         }
