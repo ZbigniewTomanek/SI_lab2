@@ -15,8 +15,6 @@ abstract class CSPProblem<T, S>(
 
     abstract fun areConstraintsSatisfied(): Boolean
 
-    abstract fun designateVariableDomain(variable: Variable<T>)
-
     abstract fun assignValueForVariable(variable: Variable<T>, value: T)
     abstract fun backTrack()
 

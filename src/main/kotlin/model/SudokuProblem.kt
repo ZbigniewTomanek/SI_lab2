@@ -20,6 +20,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
     init
     {
         initVariables(sudokuData)
+        variableHeuristic.init(fields)
     }
 
     override fun initVariables(data: Sudoku)
@@ -36,7 +37,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
                 vRow.add(sf)
             }
 
-            vRow.forEach { v -> designateVariableDomain(v) }
+            vRow.forEach { v -> setVariableDefaultDomain(v) }
             variables.add(vRow.toList())
         }
 
@@ -54,10 +55,6 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
         variable.setDomain(vDomain)
     }
-    override fun designateVariableDomain(variable: Variable<Int>)
-    {
-        setVariableDefaultDomain(variable)
-    }
 
     override fun getSolution(): Sudoku
     {
@@ -73,16 +70,16 @@ class SudokuProblem(private val sudokuData: Sudoku,
     }
 
     override fun getNextVariable(): Variable<Int> {
-        currentVariable = variableHeuristic.getNextVariable(flattenFields) as SudokuField
+        currentVariable = variableHeuristic.getNextVariable() as SudokuField
         currentVariable.memorizeState()
         return currentVariable
     }
 
-    override fun hasNextVariable(): Boolean = variableHeuristic.hasNextVariable(flattenFields)
-    override fun hasPreviousVariable(): Boolean = variableHeuristic.hasPreviousVariable(flattenFields)
+    override fun hasNextVariable(): Boolean = variableHeuristic.hasNextVariable()
+    override fun hasPreviousVariable(): Boolean = variableHeuristic.hasPreviousVariable()
     override fun getPreviousVariable(): Variable<Int>
     {
-        currentVariable = variableHeuristic.getPreviousVariable(flattenFields) as SudokuField
+        currentVariable = variableHeuristic.getPreviousVariable() as SudokuField
         return currentVariable
     }
 

@@ -1,10 +1,14 @@
 package csp
 
-interface VariableHeuristic<T>
+abstract class VariableHeuristic<T>
 {
-    fun getNextVariable(variables: List<Variable<T>>): Variable<T>
-    fun hasNextVariable(variables: List<Variable<T>>): Boolean
+    lateinit var fields: List<List<Variable<T>>>
 
-    fun getPreviousVariable(variables: List<Variable<T>>): Variable<T>
-    fun hasPreviousVariable(variables: List<Variable<T>>): Boolean
+    abstract fun init(fields: List<List<Variable<T>>>)
+
+    abstract fun getNextVariable(): Variable<T>
+    abstract fun hasNextVariable(): Boolean
+
+    abstract fun getPreviousVariable(): Variable<T>
+    abstract fun hasPreviousVariable(): Boolean
 }
