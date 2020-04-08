@@ -13,6 +13,36 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     private val fcDomainHistory = Stack<MutableList<Int>>()
     private var valueHistory = Stack<Int>()
 
+    /*
+    ----------------
+    Getting value
+    ----------------
+     */
+
+    override fun getNextValue(): Int
+    {
+        val nextValue = valueHeuristic.getNextValue(domain)
+        domain.remove(nextValue)
+        return nextValue
+    }
+
+    override fun hasNextValue(): Boolean
+    {
+        return valueHeuristic.hasNextValue(domain)
+    }
+
+    override fun assignValue(value: Int)
+    {
+        this.value = value
+    }
+
+    override fun getValue(): Int = value
+
+    /*
+    ----------------
+    Backtracking
+    ----------------
+     */
 
     override fun backTrack()
     {
@@ -27,23 +57,6 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     }
 
 
-    override fun assignValue(value: Int)
-    {
-        this.value = value
-    }
-
-    override fun getNextValue(): Int
-    {
-        val nextValue = valueHeuristic.getNextValue(domain)
-        domain.remove(nextValue)
-        return nextValue
-    }
-
-    override fun hasNextValue(): Boolean
-    {
-        return valueHeuristic.hasNextValue(domain)
-    }
-
     override fun setDomain(domain: List<Int>)
     {
         this.domain = domain.toMutableList()
@@ -51,7 +64,12 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun getDomain(): List<Int> = domain.toList()
 
-    override fun getValue(): Int = value
+
+    /*
+    ----------------
+    Forward checking
+    ----------------
+     */
 
     override fun hasEmptyDomain(): Boolean = domain.isEmpty()
 
@@ -70,6 +88,12 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
         fcDomainHistory.push(domain.toMutableList())
         domain.remove(value)
     }
+
+    /*
+    ----------------
+    Utilities
+    ----------------
+     */
 
     override fun toString() = "Var(val: $value, pos: ($posX, $posY)domain: $domain)"
 

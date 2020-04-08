@@ -4,6 +4,7 @@ import csp.CSPProblem
 import csp.ValueHeuristic
 import csp.Variable
 import csp.VariableHeuristic
+import model.Sudoku.Companion.getCorrelatedFields
 import java.util.*
 
 class SudokuProblem(private val sudokuData: Sudoku,
@@ -16,6 +17,11 @@ class SudokuProblem(private val sudokuData: Sudoku,
     private lateinit var currentVariable: SudokuField
     private val correlatedFieldsHistory = Stack<List<SudokuField>>()
 
+    /*
+    ---------------
+    Initialisation
+    ---------------
+    */
     init
     {
         initVariables(sudokuData)
@@ -68,6 +74,12 @@ class SudokuProblem(private val sudokuData: Sudoku,
         return Sudoku(sudokuData.index, sudokuData.difficultyLevel, solution.toList())
     }
 
+    /*
+    ---------------
+    Next/prev
+    ---------------
+    */
+
     override fun getNextVariable(): Variable<Int> {
         currentVariable = variableHeuristic.getNextVariable() as SudokuField
         currentVariable.memorizeState()
@@ -82,109 +94,22 @@ class SudokuProblem(private val sudokuData: Sudoku,
         return currentVariable
     }
 
-    fun getCorrelatedFields(field: SudokuField): List<SudokuField>
-    {
-        val posX = field.posX
-        val posY = field.posY
-        val relatedFields = mutableSetOf<SudokuField>()
 
-        for (i in fields[posX].indices)
-        {
-            relatedFields.add(fields[i][posY])
-            relatedFields.add(fields
-                    [(posY / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + i % Sudoku.SUBGRID_SIZE]
-                    [(posX / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + i / Sudoku.SUBGRID_SIZE])
-        }
-
-        fields[posX].forEach { f -> relatedFields.add(f) }
-
-        return relatedFields.filter { f -> f.getValue() == Sudoku.EMPTY_FIELD_REPR }
-    }
+    /*
+    ---------------
+    Backtracking
+    ---------------
+    */
 
 
-    private fun validatePlatformPart(part: List<SudokuField>): Boolean
-    {
-        val repetitionCheckSet = mutableSetOf<Int>()
-
-        for (field in part)
-        {
-            val fieldValue = field.getValue()
-            if (fieldValue != Sudoku.EMPTY_FIELD_REPR)
-            {
-                if (fieldValue in repetitionCheckSet)
-                {
-                    return false
-                }
-                else
-                {
-                    repetitionCheckSet.add(fieldValue)
-                }
-            }
-        }
-
-        return true
-    }
-
-    private fun wasMoveCorrect(): Boolean
-    {
-        val posX = currentVariable.posX
-        val posY = currentVariable.posY
-
-        val column = mutableListOf<SudokuField>()
-        val square = mutableListOf<SudokuField>()
-        val row = fields[posY]
-
-        for (i in fields[posX].indices)
-        {
-            column.add(fields[i][posX])
-            square.add(fields
-                    [(posY / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + i % Sudoku.SUBGRID_SIZE]
-                    [(posX / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + i / Sudoku.SUBGRID_SIZE])
-        }
-
-
-        if (!validatePlatformPart(column) || !validatePlatformPart(row) || !validatePlatformPart(square))
-        {
-            return false
-        }
-
-        return true
-    }
-
-    private fun validateWholePlatform(): Boolean
-    {
-        for (i in fields.indices)
-        {
-            val column = mutableListOf<SudokuField>()
-            val square = mutableListOf<SudokuField>()
-            val row = fields[i]
-
-            for (j in fields[i].indices)
-            {
-                column.add(fields[j][i])
-                square.add(fields
-                        [(i / Sudoku.SUBGRID_SIZE) * Sudoku.SUBGRID_SIZE + j / Sudoku.SUBGRID_SIZE]
-                        [i * Sudoku.SUBGRID_SIZE % Sudoku.GRID_SIZE + j % Sudoku.SUBGRID_SIZE])
-            }
-
-            if (!validatePlatformPart(column) || !validatePlatformPart(row) || !validatePlatformPart(square))
-            {
-                return false
-            }
-
-        }
-
-        return true
-    }
-
-    override fun areConstraintsSatisfied(): Boolean = wasMoveCorrect()
+    override fun areConstraintsSatisfied(): Boolean
+            = Sudoku.validatePlatformForField(currentVariable.posX, currentVariable.posY, fields)
 
     override fun assignValueForVariable(value: Int, variable: Variable<Int>)
     {
         variable.assignValue(value)
     }
 
-    override fun toString() = "Sudoku problem nr ${sudokuData.index}, diff: ${sudokuData.difficultyLevel}"
     override fun assignValueForVariable(variable: Variable<Int>, value: Int)
     {
         variable.assignValue(value)
@@ -195,10 +120,17 @@ class SudokuProblem(private val sudokuData: Sudoku,
         currentVariable.backTrack()
     }
 
+
+    /*
+    ----------------
+    Forward checking
+    ----------------
+     */
+
     override fun checkForward()
     {
         val value = currentVariable.getValue()
-        val correlatedFields = getCorrelatedFields(currentVariable)
+        val correlatedFields = getCorrelatedFields(currentVariable, fields)
 
         correlatedFieldsHistory.push(correlatedFields)
 
@@ -219,4 +151,6 @@ class SudokuProblem(private val sudokuData: Sudoku,
         val correlatedFields = correlatedFieldsHistory.peek()
         return correlatedFields.any { f -> f.hasEmptyDomain() }
     }
+
+    override fun toString() = "Sudoku problem nr ${sudokuData.index}, diff: ${sudokuData.difficultyLevel}"
 }
