@@ -29,7 +29,7 @@ object SudokuReader {
             for (j in 0 until  Sudoku.GRID_SIZE)
             {
                 val char = sudokuString[index++]
-                rowList.add(if (char == '.') 0 else char.toInt() - '0'.toInt())
+                rowList.add(if (char == '.') Sudoku.EMPTY_FIELD_REPR else char.toInt() - '0'.toInt())
             }
 
             sudokuList.add(rowList)

@@ -44,6 +44,5 @@ fun main()
 {
     val valueHeuristic = BaselineValueHeuristic()
     val variableHeuristic = BaselineVariableHeuristic()
-    solveSudoku(42, valueHeuristic, variableHeuristic)
-    //checkHowManyCrashes()
+    solveSudoku(0, valueHeuristic, variableHeuristic)
 }
