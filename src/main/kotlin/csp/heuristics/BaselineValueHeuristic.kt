@@ -2,13 +2,13 @@ package csp.heuristics
 
 import csp.ValueHeuristic
 
-class BaselineValueHeuristic : ValueHeuristic<Char>
+class BaselineValueHeuristic : ValueHeuristic<Int>
 {
 
-    override fun getNextValue(domain: List<Char>): Char
+    override fun getNextValue(domain: List<Int>): Int
     {
         return domain[0]
     }
 
-    override fun hasNextValue(domain: List<Char>): Boolean = domain.isNotEmpty()
+    override fun hasNextValue(domain: List<Int>): Boolean = domain.isNotEmpty()
 }

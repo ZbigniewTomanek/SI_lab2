@@ -4,14 +4,14 @@ import csp.ValueHeuristic
 import csp.Variable
 import java.util.*
 
-class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHeuristic: ValueHeuristic<Char>)
-    : Variable<Char>(valueHeuristic)
+class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeuristic: ValueHeuristic<Int>)
+    : Variable<Int>(valueHeuristic)
 {
-    private lateinit var domain: MutableList<Char>
+    private lateinit var domain: MutableList<Int>
 
-    private val domainHistory = Stack<MutableList<Char>>()
-    private val fcDomainHistory = Stack<MutableList<Char>>()
-    private var valueHistory = Stack<Char>()
+    private val domainHistory = Stack<MutableList<Int>>()
+    private val fcDomainHistory = Stack<MutableList<Int>>()
+    private var valueHistory = Stack<Int>()
 
 
     override fun backTrack()
@@ -27,12 +27,12 @@ class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHe
     }
 
 
-    override fun assignValue(value: Char)
+    override fun assignValue(value: Int)
     {
         this.value = value
     }
 
-    override fun getNextValue(): Char
+    override fun getNextValue(): Int
     {
         val nextValue = valueHeuristic.getNextValue(domain)
         domain.remove(nextValue)
@@ -44,14 +44,14 @@ class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHe
         return valueHeuristic.hasNextValue(domain)
     }
 
-    override fun setDomain(domain: List<Char>)
+    override fun setDomain(domain: List<Int>)
     {
         this.domain = domain.toMutableList()
     }
 
-    override fun getDomain(): List<Char> = domain.toList()
+    override fun getDomain(): List<Int> = domain.toList()
 
-    override fun getValue(): Char = value
+    override fun getValue(): Int = value
 
     override fun hasEmptyDomain(): Boolean = domain.isEmpty()
 
@@ -65,7 +65,7 @@ class SudokuField(private var value: Char, val posX: Int, val posY: Int, valueHe
 
     }
 
-    override fun filterDomain(value: Char)
+    override fun filterDomain(value: Int)
     {
         fcDomainHistory.push(domain.toMutableList())
         domain.remove(value)

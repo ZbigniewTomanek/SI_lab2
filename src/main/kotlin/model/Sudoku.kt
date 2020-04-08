@@ -1,6 +1,6 @@
 package model
 
-data class Sudoku(val index: Int, val difficultyLevel: Float, val platform: List<List<Char>>)
+data class Sudoku(val index: Int, val difficultyLevel: Float, val platform: List<List<Int>>)
 {
     override fun toString() = "Sudoku nr $index, diff: $difficultyLevel"
 
@@ -24,9 +24,9 @@ data class Sudoku(val index: Int, val difficultyLevel: Float, val platform: List
     }
     companion object
     {
-        fun getDomainAsChar() = listOf('1', '2', '3', '4', '5', '6', '7', '8', '9')
+        fun getDomain() = (1..9).toList()
         const val GRID_SIZE = 9
         const val SUBGRID_SIZE = 3
-        const val EMPTY_FIELD_REPR = '.'
+        const val EMPTY_FIELD_REPR = 0
     }
 }

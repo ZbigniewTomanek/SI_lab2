@@ -5,7 +5,7 @@ import csp.VariableHeuristic
 import model.Sudoku
 import java.util.*
 
-class RandomVariableHeuristic : VariableHeuristic<Char>
+class RandomVariableHeuristic : VariableHeuristic<Int>
 {
     private var currentVariable = -1
     private val variableQueue: List<Int>
@@ -17,16 +17,16 @@ class RandomVariableHeuristic : VariableHeuristic<Char>
         variableQueue = indicesList.toList()
     }
 
-    override fun getNextVariable(variables: List<Variable<Char>>): Variable<Char>{
+    override fun getNextVariable(variables: List<Variable<Int>>): Variable<Int>{
         return variables[variableQueue[++currentVariable]]
     }
 
 
-    override fun hasNextVariable(variables: List<Variable<Char>>): Boolean = currentVariable < variableQueue.size - 1
+    override fun hasNextVariable(variables: List<Variable<Int>>): Boolean = currentVariable < variableQueue.size - 1
 
-    override fun getPreviousVariable(variables: List<Variable<Char>>): Variable<Char>
+    override fun getPreviousVariable(variables: List<Variable<Int>>): Variable<Int>
             = variables[variableQueue[--currentVariable]]
 
-    override fun hasPreviousVariable(variables: List<Variable<Char>>) = currentVariable > 0
+    override fun hasPreviousVariable(variables: List<Variable<Int>>) = currentVariable > 0
 
 }

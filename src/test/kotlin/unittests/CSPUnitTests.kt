@@ -10,19 +10,19 @@ import model.SudokuField
 import model.SudokuProblem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import utils.Reader
+import utils.SudokuReader
 
 class CSPUnitTests
 {
     lateinit var sudokuProblem: SudokuProblem
     lateinit var sudoku: Sudoku
-    private val baselineVariableHeuristic: VariableHeuristic<Char> = LeastLimitingVariableHeuristic()
-    private val baselineValueHeuristic: ValueHeuristic<Char> = RandomValueHeuristic()
+    private val baselineVariableHeuristic: VariableHeuristic<Int> = LeastLimitingVariableHeuristic()
+    private val baselineValueHeuristic: ValueHeuristic<Int> = RandomValueHeuristic()
 
     @BeforeEach
     fun configureVariables()
     {
-        sudoku = Reader.getSudoku(0)
+        sudoku = SudokuReader.getSudoku(0)
         sudokuProblem = SudokuProblem(sudoku, baselineValueHeuristic, baselineVariableHeuristic)
     }
 
@@ -33,7 +33,7 @@ class CSPUnitTests
         sudokuProblem.getNextVariable()
         sudokuProblem.getNextVariable()
         val variable = sudokuProblem.getNextVariable()
-        val returnedValues = mutableListOf<Char>()
+        val returnedValues = mutableListOf<Int>()
 
         while (variable.hasNextValue())
         {
@@ -42,7 +42,7 @@ class CSPUnitTests
             returnedValues.add(value)
         }
 
-        assert(Sudoku.getDomainAsChar().toSet() == returnedValues.toSet())
+        assert(Sudoku.getDomain().toSet() == returnedValues.toSet())
 
     }
 
@@ -50,7 +50,7 @@ class CSPUnitTests
     fun testBaselineVarHeuristic()
     {
         val sp = SudokuProblem(sudoku, BaselineValueHeuristic(), BaselineVariableHeuristic())
-        val returnedVars = mutableListOf<Variable<Char>>()
+        val returnedVars = mutableListOf<Variable<Int>>()
 
         while (sp.hasNextVariable())
         {
@@ -58,7 +58,7 @@ class CSPUnitTests
             returnedVars.add(retVar)
         }
 
-        val values: List<Char> = sudoku.platform.flatten()
+        val values: List<Int> = sudoku.platform.flatten()
         val variableValues = returnedVars.map { v -> v.getValue() }
 
 
@@ -71,7 +71,7 @@ class CSPUnitTests
     {
 
         val firstVar = sudokuProblem.getNextVariable()
-        var variable: Variable<Char>? = null
+        var variable: Variable<Int>? = null
 
         while (sudokuProblem.hasNextVariable())
         {
@@ -113,7 +113,7 @@ class CSPUnitTests
     @Test
     fun testConstraintsColumn()
     {
-        val np = Reader.getSudoku(46)
+        val np = SudokuReader.getSudoku(46)
         val sp = SudokuProblem(np, baselineValueHeuristic, baselineVariableHeuristic)
         assert(!sp.areConstraintsSatisfied())
     }
@@ -139,7 +139,7 @@ class CSPUnitTests
         val variable = sudokuProblem.getNextVariable()
         val firstValue = variable.getValue()
 
-        sudokuProblem.assignValueForVariable('1', variable)
+        sudokuProblem.assignValueForVariable(1, variable)
         sudokuProblem.backTrack()
 
         assert(firstValue == variable.getValue())

@@ -1,11 +1,9 @@
 package utils
 
 import model.Sudoku
-import model.SudokuProblem
 import java.io.File
 
-object Reader
-{
+object SudokuReader {
     private const val SUDOKU_PATH = "problem_data/Sudoku.csv"
 
     private lateinit var sudokus: List<Sudoku>
@@ -19,18 +17,19 @@ object Reader
     }
 
 
-    private fun stringToSudoku(sudokuString: String): List<List<Char>>
+    private fun stringToSudoku(sudokuString: String): List<List<Int>>
     {
         var index = 0
-        var rowList: MutableList<Char>
-        val sudokuList = mutableListOf<List<Char>>()
+        var rowList: MutableList<Int>
+        val sudokuList = mutableListOf<List<Int>>()
 
         for (i in 0 until Sudoku.GRID_SIZE)
         {
             rowList = mutableListOf()
             for (j in 0 until  Sudoku.GRID_SIZE)
             {
-                rowList.add(sudokuString[index++])
+                val char = sudokuString[index++]
+                rowList.add(if (char == '.') 0 else char.toInt() - '0'.toInt())
             }
 
             sudokuList.add(rowList)
@@ -40,7 +39,7 @@ object Reader
         return sudokuList.toList()
     }
 
-    fun readSudokus()
+    private fun readSudokus()
     {
         var content = File(SUDOKU_PATH).readLines()
         content = content.subList(1, content.size)
@@ -56,5 +55,5 @@ object Reader
 
         this.sudokus = sudokus.toList()
     }
-
 }
+

@@ -3,15 +3,15 @@ import csp.ValueHeuristic
 import csp.VariableHeuristic
 import csp.heuristics.*
 import model.SudokuProblem
-import utils.Reader
+import utils.SudokuReader
 
 fun solveSudoku
             (index: Int, valueHeuristic:
-            ValueHeuristic<Char>,
-             variableHeuristic: VariableHeuristic<Char>,
+            ValueHeuristic<Int>,
+             variableHeuristic: VariableHeuristic<Int>,
              checkForward: Boolean = false)
 {
-    val sudoku = Reader.getSudoku(index)
+    val sudoku = SudokuReader.getSudoku(index)
     println("Before")
     println(sudoku)
     sudoku.printPlatform()
