@@ -15,6 +15,7 @@ class LeastLimitingVariableHeuristic : VariableHeuristic<Int>()
 
     override fun getNextVariable(): Variable<Int>
     {
+
         variablesToUse.sortBy { v -> - v.getDomain().size }
         val nextVar = variablesToUse.removeAt(variablesToUse.size - 1)
         usedVariables.add(nextVar)
@@ -26,11 +27,12 @@ class LeastLimitingVariableHeuristic : VariableHeuristic<Int>()
 
     override fun getPreviousVariable(): Variable<Int>
     {
-        val prevVar = usedVariables.removeAt(usedVariables.size - 1)
-        variablesToUse.add(prevVar)
-        return prevVar
+        val currVar = usedVariables.removeAt(usedVariables.size - 1)
+        variablesToUse.add(currVar)
+
+        return usedVariables[usedVariables.size - 1]
     }
 
 
-    override fun hasPreviousVariable(): Boolean = usedVariables.isNotEmpty()
+    override fun hasPreviousVariable(): Boolean = usedVariables.size > 1
 }

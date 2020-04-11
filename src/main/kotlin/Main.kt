@@ -42,7 +42,7 @@ fun solveSudoku
 fun main()
 {
     val valueHeuristic = BaselineValueHeuristic()
-    val variableHeuristic = BaselineVariableHeuristic()
-    solveSudoku(0, valueHeuristic, variableHeuristic, true)
+    val variableHeuristic = LeastLimitingVariableHeuristic()
+    solveSudoku(0, valueHeuristic, variableHeuristic)
     //solveSudoku(0, valueHeuristic, variableHeuristic, false)
 }
