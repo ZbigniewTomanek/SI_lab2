@@ -166,9 +166,9 @@ class SudokuProblem(private val sudokuData: Sudoku,
         currentVariable.backTrack()
     }
 
-    override fun isAnyFilteredDomainEmpty(): Boolean {
+    override fun wouldAnyDomainBeEmpty(value: Int): Boolean {
         val correlatedFields = correlatedFieldsHistory.peek()
-        return correlatedFields.any { f -> f.hasEmptyDomain() }
+        return correlatedFields.any { f -> f.willMakeDomainEmpty(value) }
     }
 
     override fun toString() = "Sudoku problem nr ${sudokuData.index}, diff: ${sudokuData.difficultyLevel}"

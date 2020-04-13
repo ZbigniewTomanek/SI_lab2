@@ -71,7 +71,7 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     ----------------
      */
 
-    override fun hasEmptyDomain(): Boolean = domain.isEmpty()
+    override fun willMakeDomainEmpty(value: Int): Boolean = domain.size == 1 && value in domain
 
     override fun backTrackDomain()
     {

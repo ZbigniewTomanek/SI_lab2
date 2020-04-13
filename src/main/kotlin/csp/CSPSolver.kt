@@ -86,8 +86,7 @@ object CSPSolver
     private fun <T, S> fcBackTrack(problem: CSPProblem<T, S>): Boolean
     {
         recurrencesOfLastRun++
-        //problem.fcBackTrack()
-        problem.backTrack()
+        problem.fcBackTrack()
         currVar--
         return findValueForVariableForwardChecking(problem, problem.getPreviousVariable())
     }
@@ -106,17 +105,16 @@ object CSPSolver
 
         } else
         {
-            assignmentsOfLastRun++
             val value = variable.getNextValue()
-            problem.assignValueForVariable(value, variable)
-            problem.checkForward()
 
-            return if (!problem.areConstraintsSatisfied())
+            return if (problem.wouldAnyDomainBeEmpty(value))
             {
-                problem.backTrackFiltering()
-                findValueForVariableForwardChecking(problem, variable)
+                fcBackTrack(problem)
             } else
             {
+                assignmentsOfLastRun++
+                problem.assignValueForVariable(value, variable)
+                problem.checkForward()
                 return false
             }
         }
@@ -142,8 +140,7 @@ object CSPSolver
             {
                 currentVariable = problem.getNextVariable()
                 problem.saveCorrelatedVarsDomainsState()
-                currVar++
-                println(currVar)
+                println(currVar++)
 
                 foundAllSolutions = findValueForVariableForwardChecking(problem, currentVariable)
             }
