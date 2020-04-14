@@ -144,11 +144,6 @@ class SudokuProblem(private val sudokuData: Sudoku,
     ----------------
      */
 
-    override fun backTrackFiltering()
-    {
-        val correlatedFields = correlatedFieldsHistory.peek()
-        correlatedFields.forEach { f -> f.recoverDomainElement() }
-    }
 
     override fun saveCorrelatedVarsDomainsState()
     {

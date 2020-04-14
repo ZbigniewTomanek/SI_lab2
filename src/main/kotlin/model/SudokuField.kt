@@ -12,7 +12,6 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     private val domainHistory = Stack<MutableList<Int>>()
     private val fcDomainHistory = Stack<MutableList<Int>>()
     private val valueHistory = Stack<Int>()
-    private val recentlyRemovedValues = Stack<Int>()
 
     /*
     ----------------
@@ -85,14 +84,9 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun filterDomain(value: Int)
     {
-        recentlyRemovedValues.push(value)
         domain.remove(value)
     }
 
-    override fun recoverDomainElement()
-    {
-        domain.add(recentlyRemovedValues.pop())
-    }
 
     /*
     ----------------

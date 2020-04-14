@@ -61,7 +61,6 @@ object CSPSolver
                 solutions.add(solution)
 
                 foundAllSolutions = nBackTrack(problem)
-
             }
             else
             {
@@ -88,6 +87,8 @@ object CSPSolver
         recurrencesOfLastRun++
         problem.fcBackTrack()
         currVar--
+
+        println(currVar)
         return findValueForVariableForwardChecking(problem, problem.getPreviousVariable())
     }
 
@@ -140,7 +141,8 @@ object CSPSolver
             {
                 currentVariable = problem.getNextVariable()
                 problem.saveCorrelatedVarsDomainsState()
-                println(currVar++)
+                currVar++
+                println(currVar)
 
                 foundAllSolutions = findValueForVariableForwardChecking(problem, currentVariable)
             }

@@ -16,7 +16,7 @@ class CSPUnitTests
 {
     lateinit var sudokuProblem: SudokuProblem
     lateinit var sudoku: Sudoku
-    private val baselineVariableHeuristic: VariableHeuristic<Int> = LeastLimitingVariableHeuristic()
+    private val baselineVariableHeuristic: VariableHeuristic<Int> = BaselineVariableHeuristic()
     private val baselineValueHeuristic: ValueHeuristic<Int> = RandomValueHeuristic()
 
     @BeforeEach
@@ -104,17 +104,8 @@ class CSPUnitTests
     @Test
     fun testConstraintsSatisfactionWithDots()
     {
+        sudokuProblem.getNextVariable()
         assert(sudokuProblem.areConstraintsSatisfied())
-
-
-    }
-
-    @Test
-    fun testConstraintsColumn()
-    {
-        val np = SudokuReader.getSudoku(46)
-        val sp = SudokuProblem(np, baselineValueHeuristic, baselineVariableHeuristic)
-        assert(!sp.areConstraintsSatisfied())
     }
 
 
@@ -144,6 +135,7 @@ class CSPUnitTests
         assert(firstValue == variable.getValue())
     }
 
+    @Test
     fun testEasySudokuSolving()
     {
         val answer = "625371948473985216819462753231794685547618329968523174196857432352146897784239561"
@@ -172,18 +164,41 @@ class CSPUnitTests
     @Test
     fun testMakingCorrectMove()
     {
+        sudokuProblem.getSolution().printPlatform()
         var variable = sudokuProblem.getNextVariable() as SudokuField
 
         while (variable.posX != 0 || variable.posY != 5)
             variable = sudokuProblem.getNextVariable() as SudokuField
+
         variable.assignValue(3)
         assert(sudokuProblem.areConstraintsSatisfied())
 
 
         while (variable.posX != 2 || variable.posY != 5)
             variable = sudokuProblem.getNextVariable() as SudokuField
+
         variable.assignValue(2)
         assert(!sudokuProblem.areConstraintsSatisfied())
+
+        sudokuProblem.getSolution().printPlatform()
+    }
+
+    @Test
+    fun testGettingCorrelatedVars()
+    {
+        sudokuProblem.getSolution().printPlatform()
+
+        var variable = sudokuProblem.getNextVariable() as SudokuField
+
+        while (variable.posX != 8 || variable.posY != 8)
+            variable = sudokuProblem.getNextVariable() as SudokuField
+
+        println(variable)
+        val correlatedFields = Sudoku.getCorrelatedFields(variable, sudokuProblem.fields)
+
+        correlatedFields.forEach { f -> sudokuProblem.assignValueForVariable(-1, f) }
+        println(correlatedFields.size)
+        sudokuProblem.getSolution().printPlatform()
     }
 
 //    @Test
