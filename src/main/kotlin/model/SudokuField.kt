@@ -21,17 +21,16 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun getNextValue(): Int
     {
-        return valueHeuristic.getNextValue(domain)
+        return valueHeuristic.getNextValue()
     }
 
     override fun hasNextValue(): Boolean
     {
-        return valueHeuristic.hasNextValue(domain)
+        return valueHeuristic.hasNextValue()
     }
 
     override fun assignValue(value: Int)
     {
-        domain.remove(value)
         this.value = value
     }
 
@@ -43,26 +42,35 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     ----------------
      */
 
-    override fun backTrack()
+    override fun backtrack()
     {
         this.value = valueHistory.pop()
         this.domain = domainHistory.pop()
+        valueHeuristic.init(this.domain)
+        valueHeuristic.backtrack()
     }
 
     override fun memorizeState()
     {
         domainHistory.push(domain.toMutableList())
         valueHistory.push(value)
+        valueHeuristic.memorize()
     }
 
 
     override fun setDomain(domain: List<Int>)
     {
         this.domain = domain.toMutableList()
+        valueHeuristic.init(this.domain)
     }
 
     override fun getDomain(): List<Int> = domain.toList()
 
+    fun addToDomain(value: Int)
+    {
+        if (value !in domain)
+            domain.add(value)
+    }
 
     /*
     ----------------
@@ -72,9 +80,10 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun willMakeDomainEmpty(value: Int): Boolean = domain.size == 1 && value in domain
 
-    override fun backTrackDomain()
+    override fun backtrackDomain()
     {
         domain = fcDomainHistory.pop()
+        valueHeuristic.init(domain)
     }
 
     override fun memorizeDomain()
@@ -85,6 +94,13 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     override fun filterDomain(value: Int)
     {
         domain.remove(value)
+        valueHeuristic.init(domain)
+    }
+
+    override fun backTrackFiltering(value: Int)
+    {
+        domain.add(value)
+        valueHeuristic.init(domain)
     }
 
 

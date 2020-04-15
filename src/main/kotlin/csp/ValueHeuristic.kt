@@ -2,6 +2,12 @@ package csp
 
 interface ValueHeuristic<T>
 {
-    fun getNextValue(domain: List<T>): T
-    fun hasNextValue(domain: List<T>): Boolean
+    fun init(domain: List<T>)
+
+    fun memorize()
+    fun backtrack()
+
+    fun getNextValue(): T
+    fun hasNextValue(): Boolean
+    fun copy(): ValueHeuristic<T>
 }

@@ -15,7 +15,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
     lateinit var fields: List<List<SudokuField>>
     private lateinit var flattenFields: List<SudokuField>
     private lateinit var currentVariable: SudokuField
-    private val correlatedFieldsHistory = Stack<List<SudokuField>>()
+    val correlatedFieldsHistory = Stack<List<SudokuField>>()
 
     /*
     ---------------
@@ -38,7 +38,8 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
             for (j in platform[i].indices)
             {
-                val sf = SudokuField(platform[i][j], j, i, valueHeuristic)
+                val valHeuristic = valueHeuristic.copy()
+                val sf = SudokuField(platform[i][j], j, i, valHeuristic)
                 vRow.add(sf)
             }
 
@@ -117,7 +118,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
 
     override fun backTrack()
     {
-        currentVariable.backTrack()
+        currentVariable.backtrack()
     }
 
 
@@ -136,6 +137,7 @@ class SudokuProblem(private val sudokuData: Sudoku,
         {
             field.filterDomain(value)
         }
+
     }
 
     /*
@@ -148,23 +150,38 @@ class SudokuProblem(private val sudokuData: Sudoku,
     override fun saveCorrelatedVarsDomainsState()
     {
         val correlatedFields = getCorrelatedFields(currentVariable, fields)
-
         correlatedFields.forEach { f -> f.memorizeDomain() }
-
         correlatedFieldsHistory.push(correlatedFields)
     }
 
     override fun fcBackTrack()
     {
         val correlatedFields = correlatedFieldsHistory.pop()
-        correlatedFields.forEach { f -> f.backTrackDomain() }
-        currentVariable.backTrack()
+        correlatedFields.forEach { f -> f.backtrackDomain() }
+        currentVariable.backtrack()
     }
 
-    override fun wouldAnyDomainBeEmpty(value: Int): Boolean {
+    override fun isAnyDomainEmpty(): Boolean {
         val correlatedFields = correlatedFieldsHistory.peek()
-        return correlatedFields.any { f -> f.willMakeDomainEmpty(value) }
+        return correlatedFields.any { f -> f.getDomain().isEmpty() }
+    }
+
+
+    override fun hasUnassignedField(): Boolean
+    {
+        return fields.flatten().any { f -> f.getValue() == 0}
     }
 
     override fun toString() = "Sudoku problem nr ${sudokuData.index}, diff: ${sudokuData.difficultyLevel}"
+
+    override fun backTrackFiltering()
+    {
+        val value = currentVariable.getValue()
+        if (value != Sudoku.EMPTY_FIELD_REPR)
+        {
+            val correlatedFields = correlatedFieldsHistory.peek()
+            correlatedFields.forEach { f -> f.addToDomain(value) }
+        }
+
+    }
 }

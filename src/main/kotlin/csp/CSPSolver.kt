@@ -1,5 +1,8 @@
 package csp
 
+import model.Sudoku
+import model.SudokuProblem
+
 object CSPSolver
 {
     var assignmentsOfLastRun = 0
@@ -80,20 +83,18 @@ object CSPSolver
         return findCSPSolution(problem)
     }
 
-    private var currVar: Int = 0
-
     private fun <T, S> fcBackTrack(problem: CSPProblem<T, S>): Boolean
     {
         recurrencesOfLastRun++
-        problem.fcBackTrack()
-        currVar--
 
-        println(currVar)
-        return findValueForVariableForwardChecking(problem, problem.getPreviousVariable())
+        problem.fcBackTrack()
+
+        return findValueForVariableForwardChecking(problem as CSPProblem<T, S>, (problem as CSPProblem<T, S>).getPreviousVariable())
     }
 
     private fun <T, S> findValueForVariableForwardChecking(problem: CSPProblem<T, S>, variable: Variable<T>): Boolean
     {
+
         if (!variable.hasNextValue())
         {
             return if (problem.hasPreviousVariable())
@@ -106,18 +107,23 @@ object CSPSolver
 
         } else
         {
+            problem.backTrackFiltering()
             val value = variable.getNextValue()
+            assignmentsOfLastRun++
+            problem.assignValueForVariable(value, variable)
 
-            return if (problem.wouldAnyDomainBeEmpty(value))
+            if (problem.isAnyDomainEmpty())
+                return fcBackTrack(problem)
+
+            return if (problem.areConstraintsSatisfied())
             {
-                fcBackTrack(problem)
+                problem.checkForward()
+                false
             } else
             {
-                assignmentsOfLastRun++
-                problem.assignValueForVariable(value, variable)
-                problem.checkForward()
-                return false
+                findValueForVariableForwardChecking(problem, variable)
             }
+
         }
     }
 
@@ -134,15 +140,12 @@ object CSPSolver
                 println("solution")
                 val solution = problem.getSolution()
                 solutions.add(solution)
-
                 foundAllSolutions = fcBackTrack(problem)
             }
             else
             {
                 currentVariable = problem.getNextVariable()
                 problem.saveCorrelatedVarsDomainsState()
-                currVar++
-                println(currVar)
 
                 foundAllSolutions = findValueForVariableForwardChecking(problem, currentVariable)
             }

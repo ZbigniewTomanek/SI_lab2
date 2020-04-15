@@ -21,5 +21,7 @@ abstract class CSPProblem<T, S>(
     abstract fun saveCorrelatedVarsDomainsState()
     abstract fun checkForward()
     abstract fun fcBackTrack()
-    abstract fun wouldAnyDomainBeEmpty(value: T): Boolean
+    abstract fun isAnyDomainEmpty(): Boolean
+    abstract fun hasUnassignedField(): Boolean
+    abstract fun backTrackFiltering()
 }

@@ -17,7 +17,7 @@ class CSPUnitTests
     lateinit var sudokuProblem: SudokuProblem
     lateinit var sudoku: Sudoku
     private val baselineVariableHeuristic: VariableHeuristic<Int> = BaselineVariableHeuristic()
-    private val baselineValueHeuristic: ValueHeuristic<Int> = RandomValueHeuristic()
+    private val baselineValueHeuristic: ValueHeuristic<Int> = BaselineValueHeuristic()
 
     @BeforeEach
     fun configureVariables()
@@ -201,22 +201,44 @@ class CSPUnitTests
         sudokuProblem.getSolution().printPlatform()
     }
 
+    @Test
+    fun testForwardChecking()
+    {
+        var variable = sudokuProblem.getNextVariable() as SudokuField
+        while (sudokuProblem.hasNextVariable() && variable.getValue() == Sudoku.EMPTY_FIELD_REPR)
+        {
+            variable = sudokuProblem.getNextVariable() as SudokuField
+        }
+
+        sudokuProblem.saveCorrelatedVarsDomainsState()
+        val correlatedFields = Sudoku.getCorrelatedFields(variable, sudokuProblem.fields)
+        val value = variable.getValue()
+
+        sudokuProblem.checkForward()
+
+        assert(correlatedFields.all { f -> f.getValue() == 0 })
+
+        correlatedFields.forEach { f -> assert(value !in f.getDomain()) }
+        sudokuProblem.fcBackTrack()
+        correlatedFields.forEach { f -> assert(value in f.getDomain()) }
+    }
+
 //    @Test
-//    fun testForwardChecking()
+//    fun testEmptyingDomains()
 //    {
-//        var variable = sudokuProblem.getNextVariable()
-//        while (sudokuProblem.hasNextVariable() && variable.getValue() == Sudoku.EMPTY_FIELD_REPR)
-//        {
-//            variable = sudokuProblem.getNextVariable()
-//        }
-//        val correlatedFields = sudokuProblem.getCorrelatedFields(variable as SudokuField)
-//        val value = variable.getValue()
-//
+//        sudokuProblem.getSolution().printPlatform()
+//        var variable = sudokuProblem.getNextVariable() as SudokuField
+//        sudokuProblem.saveCorrelatedVarsDomainsState()
+//        println(sudokuProblem.isAnyDomainEmpty(6))
 //        sudokuProblem.checkForward()
 //
-//        correlatedFields.forEach { f -> assert(value !in f.getDomain()) }
-//        sudokuProblem.fcBackTrack()
-//        correlatedFields.forEach { f -> assert(value in f.getDomain()) }
+//        while (variable.posX != 3 || variable.posY != 0)
+//            variable = sudokuProblem.getNextVariable() as SudokuField
+//
+//        println(variable)
+//
+//
+//        println(variable.hasNextValue())
 //    }
 
 }

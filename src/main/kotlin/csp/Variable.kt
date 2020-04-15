@@ -15,8 +15,9 @@ abstract class Variable<T>(val valueHeuristic: ValueHeuristic<T>)
     abstract fun willMakeDomainEmpty(value: T): Boolean
 
     abstract fun memorizeState()
-    abstract fun backTrack()
+    abstract fun backtrack()
 
-    abstract fun backTrackDomain()
+    abstract fun backtrackDomain()
     abstract fun memorizeDomain()
+    abstract fun backTrackFiltering(value: T)
 }

@@ -2,6 +2,8 @@ import csp.CSPSolver
 import csp.ValueHeuristic
 import csp.VariableHeuristic
 import csp.heuristics.*
+import model.Sudoku
+import model.SudokuField
 import model.SudokuProblem
 import utils.SudokuReader
 
@@ -42,7 +44,9 @@ fun solveSudoku
 fun main()
 {
     val valueHeuristic = BaselineValueHeuristic()
-    val variableHeuristic = BaselineVariableHeuristic()
-    solveSudoku(0, valueHeuristic, variableHeuristic, true)
+    val variableHeuristic = LeastLimitingVariableHeuristic()
+
+
+    solveSudoku(42, valueHeuristic, variableHeuristic, true)
     //solveSudoku(0, valueHeuristic, variableHeuristic, false)
 }
