@@ -9,6 +9,11 @@ class RandomVariableHeuristic : VariableHeuristic<Int>()
     private var currentVariable = -1
     private lateinit var variables: List<Variable<Int>>
 
+    override fun copy(): VariableHeuristic<Int>
+    {
+        return RandomVariableHeuristic()
+    }
+
     override fun init(fields: List<List<Variable<Int>>>)
     {
         val shuffledVars = fields.flatten().toMutableList()
@@ -28,5 +33,4 @@ class RandomVariableHeuristic : VariableHeuristic<Int>()
             = variables[--currentVariable]
 
     override fun hasPreviousVariable() = currentVariable > 0
-
 }

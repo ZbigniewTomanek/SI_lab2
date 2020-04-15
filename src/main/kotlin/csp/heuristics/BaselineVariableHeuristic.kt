@@ -7,6 +7,11 @@ class BaselineVariableHeuristic : VariableHeuristic<Int>()
 {
     private lateinit var variables: List<Variable<Int>>
 
+    override fun copy(): VariableHeuristic<Int>
+    {
+        return BaselineVariableHeuristic()
+    }
+
     override fun init(fields: List<List<Variable<Int>>>)
     {
         variables = fields.flatten()

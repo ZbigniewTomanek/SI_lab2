@@ -8,6 +8,11 @@ class LeastLimitingVariableHeuristic : VariableHeuristic<Int>()
     private val usedVariables = mutableListOf<Variable<Int>>()
     private lateinit var variablesToUse: MutableList<Variable<Int>>
 
+    override fun copy(): VariableHeuristic<Int>
+    {
+        return LeastLimitingVariableHeuristic()
+    }
+
     override fun init(fields: List<List<Variable<Int>>>)
     {
         this.variablesToUse = fields.flatten().toMutableList()

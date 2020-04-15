@@ -1,18 +1,22 @@
 package csp
 
-import model.Sudoku
-import model.SudokuProblem
-
 object CSPSolver
 {
-    var assignmentsOfLastRun = 0
-    var recurrencesOfLastRun = 0
+    private var startTime = 0L
+    var totalTimeOfLastRun = 0L
+    var timeToFirstSolution = 0L
+    var totalAssignmentsOfLastRun = 0
+    var totalRecurrencesOfLastRun = 0
+    var assignmentsToFirstSolution = 0
+    var recurrencesToFirstSolution = 0
+    var foundFirstSolution = false
+
 
     private fun <T, S> nBackTrack(problem: CSPProblem<T, S>): Boolean
     {
-        problem.backTrack()
-        recurrencesOfLastRun++
+        totalRecurrencesOfLastRun++
 
+        problem.backTrack()
         return findValueForVariable(problem, problem.getPreviousVariable())
     }
 
@@ -33,8 +37,9 @@ object CSPSolver
         }
         else
         {
+            totalAssignmentsOfLastRun++
+
             val value = variable.getNextValue()
-            assignmentsOfLastRun++
             problem.assignValueForVariable(value, variable)
 
             return if (problem.areConstraintsSatisfied())
@@ -59,7 +64,14 @@ object CSPSolver
         {
             if (!problem.hasNextVariable())
             {
-                println("solution")
+                if (!foundFirstSolution){
+                    foundFirstSolution = true
+
+                    timeToFirstSolution = System.currentTimeMillis() - startTime
+                    assignmentsToFirstSolution = totalAssignmentsOfLastRun
+                    recurrencesToFirstSolution = totalRecurrencesOfLastRun
+                }
+
                 val solution = problem.getSolution()
                 solutions.add(solution)
 
@@ -72,24 +84,17 @@ object CSPSolver
             }
         }
 
+        totalTimeOfLastRun = System.currentTimeMillis() - startTime
         return solutions.toList()
     }
 
-    fun <T, S> solveCSPNaive(problem: CSPProblem<T, S>) : List<S>
-    {
-        assignmentsOfLastRun = 0
-        recurrencesOfLastRun = 0
-
-        return findCSPSolution(problem)
-    }
 
     private fun <T, S> fcBackTrack(problem: CSPProblem<T, S>): Boolean
     {
-        recurrencesOfLastRun++
+        totalRecurrencesOfLastRun++
 
         problem.fcBackTrack()
-
-        return findValueForVariableForwardChecking(problem as CSPProblem<T, S>, (problem as CSPProblem<T, S>).getPreviousVariable())
+        return findValueForVariableForwardChecking(problem, (problem).getPreviousVariable())
     }
 
     private fun <T, S> findValueForVariableForwardChecking(problem: CSPProblem<T, S>, variable: Variable<T>): Boolean
@@ -107,9 +112,10 @@ object CSPSolver
 
         } else
         {
+            totalAssignmentsOfLastRun++
+
             problem.backTrackFiltering()
             val value = variable.getNextValue()
-            assignmentsOfLastRun++
             problem.assignValueForVariable(value, variable)
 
             return if (problem.areConstraintsSatisfied())
@@ -124,13 +130,10 @@ object CSPSolver
                     false
                 }
 
-
-
             } else
             {
                 findValueForVariableForwardChecking(problem, variable)
             }
-
         }
     }
 
@@ -144,7 +147,13 @@ object CSPSolver
         {
             if (!problem.hasNextVariable())
             {
-                println("solution")
+                if (!foundFirstSolution){
+                    foundFirstSolution = true
+
+                    timeToFirstSolution = System.currentTimeMillis() - startTime
+                    assignmentsToFirstSolution = totalAssignmentsOfLastRun
+                    recurrencesToFirstSolution = totalRecurrencesOfLastRun
+                }
                 val solution = problem.getSolution()
                 solutions.add(solution)
                 foundAllSolutions = fcBackTrack(problem)
@@ -153,19 +162,38 @@ object CSPSolver
             {
                 currentVariable = problem.getNextVariable()
                 problem.saveCorrelatedVarsDomainsState()
-
                 foundAllSolutions = findValueForVariableForwardChecking(problem, currentVariable)
             }
         }
 
+        totalTimeOfLastRun = System.currentTimeMillis() - startTime
         return solutions.toList()
     }
 
-    fun <T, S> solveCSPForwardChecking(problem: CSPProblem<T, S>) : List<S>
+    private fun resetMeasures()
     {
-        assignmentsOfLastRun = 0
-        recurrencesOfLastRun = 0
+        totalAssignmentsOfLastRun = 0
+        totalRecurrencesOfLastRun = 0
+        recurrencesToFirstSolution = 0
+        assignmentsToFirstSolution = 0
+        totalTimeOfLastRun = 0
+        timeToFirstSolution = 0
+        foundFirstSolution = false
+    }
 
-        return findCSPSolutionForwardChecking(problem)
+
+    fun <T, S> solveCSP(problem: CSPProblem<T, S>, checkForward: Boolean=false) : List<S>
+    {
+        resetMeasures()
+
+        startTime = System.currentTimeMillis()
+        return if (checkForward)
+        {
+            findCSPSolutionForwardChecking(problem)
+        }
+        else
+        {
+            findCSPSolution(problem)
+        }
     }
 }
