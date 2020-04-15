@@ -21,12 +21,12 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
 
     override fun getNextValue(): Int
     {
-        return valueHeuristic.getNextValue()
+        return valueHeuristic.getNextValue(domain)
     }
 
     override fun hasNextValue(): Boolean
     {
-        return valueHeuristic.hasNextValue()
+        return valueHeuristic.hasNextValue(domain)
     }
 
     override fun assignValue(value: Int)
@@ -46,7 +46,6 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     {
         this.value = valueHistory.pop()
         this.domain = domainHistory.pop()
-        valueHeuristic.init(this.domain)
         valueHeuristic.backtrack()
     }
 
@@ -61,7 +60,6 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     override fun setDomain(domain: List<Int>)
     {
         this.domain = domain.toMutableList()
-        valueHeuristic.init(this.domain)
     }
 
     override fun getDomain(): List<Int> = domain.toList()
@@ -83,7 +81,6 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     override fun backtrackDomain()
     {
         domain = fcDomainHistory.pop()
-        valueHeuristic.init(domain)
     }
 
     override fun memorizeDomain()
@@ -94,13 +91,11 @@ class SudokuField(private var value: Int, val posX: Int, val posY: Int, valueHeu
     override fun filterDomain(value: Int)
     {
         domain.remove(value)
-        valueHeuristic.init(domain)
     }
 
     override fun backTrackFiltering(value: Int)
     {
         domain.add(value)
-        valueHeuristic.init(domain)
     }
 
 

@@ -112,13 +112,20 @@ object CSPSolver
             assignmentsOfLastRun++
             problem.assignValueForVariable(value, variable)
 
-            if (problem.isAnyDomainEmpty())
-                return fcBackTrack(problem)
-
             return if (problem.areConstraintsSatisfied())
             {
                 problem.checkForward()
-                false
+
+                if (problem.isAnyDomainEmpty())
+                {
+                    fcBackTrack(problem)
+                } else
+                {
+                    false
+                }
+
+
+
             } else
             {
                 findValueForVariableForwardChecking(problem, variable)
