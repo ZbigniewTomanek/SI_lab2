@@ -2,12 +2,15 @@ package csp.heuristics
 
 import csp.Variable
 import csp.VariableHeuristic
+import model.Sudoku
 import java.util.*
+import kotlin.random.Random
 
 class RandomVariableHeuristic : VariableHeuristic<Int>()
 {
     private var currentVariable = -1
     private lateinit var variables: List<Variable<Int>>
+    private val random = Random(Sudoku.seed)
 
     override fun copy(): VariableHeuristic<Int>
     {
@@ -17,7 +20,7 @@ class RandomVariableHeuristic : VariableHeuristic<Int>()
     override fun init(fields: List<List<Variable<Int>>>)
     {
         val shuffledVars = fields.flatten().toMutableList()
-        shuffledVars.shuffle(Random(System.currentTimeMillis()))
+        shuffledVars.shuffle(random)
         variables = shuffledVars.toList()
     }
 

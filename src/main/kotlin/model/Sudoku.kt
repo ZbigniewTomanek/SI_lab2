@@ -29,6 +29,7 @@ data class Sudoku(val index: Int, val difficultyLevel: Float, val platform: List
         const val GRID_SIZE = 9
         const val SUBGRID_SIZE = 3
         const val EMPTY_FIELD_REPR = 0
+        const val seed = 694201488
 
         fun getDomain() = (1..9).toList()
 

@@ -1,6 +1,7 @@
 package csp.heuristics
 
 import csp.ValueHeuristic
+import model.Sudoku
 import java.util.*
 import kotlin.random.Random
 
@@ -8,7 +9,7 @@ class RandomValueHeuristic : ValueHeuristic<Int>
 {
     private var usedValues: MutableSet<Int> = mutableSetOf()
     private val usedValuesHistory = Stack<MutableSet<Int>>()
-    val r = Random(System.currentTimeMillis())
+    private val r = Random(Sudoku.seed)
 
 
     override fun getNextValue(domain: List<Int>): Int
@@ -25,7 +26,7 @@ class RandomValueHeuristic : ValueHeuristic<Int>
 
     override fun hasNextValue(domain: List<Int>): Boolean = domain.size > usedValues.size
 
-    override fun copy(): ValueHeuristic<Int> = BaselineValueHeuristic()
+    override fun copy(): ValueHeuristic<Int> = RandomValueHeuristic()
 
     override fun memorize()
     {
